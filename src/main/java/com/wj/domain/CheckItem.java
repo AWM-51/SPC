@@ -4,7 +4,8 @@ public class CheckItem {
     private int c_id;
     private int p_id;
     private String c_name;
-    private String c_status;
+    private int c_status;
+    private int current_num;
     private String remarks;
 
     public int getC_id() {
@@ -31,12 +32,20 @@ public class CheckItem {
         this.c_name = c_name;
     }
 
-    public String getC_status() {
+    public int getC_status() {
         return c_status;
     }
 
-    public void setC_status(String c_status) {
+    public void setC_status(int c_status) {
         this.c_status = c_status;
+    }
+
+    public int getCurrent_num() {
+        return current_num;
+    }
+
+    public void setCurrent_num(int current_num) {
+        this.current_num = current_num;
     }
 
     public String getRemarks() {

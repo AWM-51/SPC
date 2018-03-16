@@ -24,7 +24,9 @@ public class ProjectDao {
     private final static String UPDATE_PROJECT_STATUS_SQL="UPDATE project_info SET p_status = ? WHERE p_id = ?";
     private final static String UPDATE_ALLPROJECTS_STATUS_1_TO_2="UPDATE project_info SET p_status = 2 WHERE p_status = 1";
     private final static String QUERY_ALLPROJECT_1_OR_2="SELECT * FROM project_info WHERE u_id = ? AND (p_status =1 OR p_status =2)";
-
+    private final static String UPDATE_NEST_PROJECT_TO_1_SQL="UPDATE project_info SET p_status=1 WHERE p_id " +
+            " = (SELECT p_id FROM (SELECT p_id FROM project_info WHERE p_status=1 OR p_status=2 ORDER BY p_id DESC " +
+            "LIMIT 1) a )";
 
 
     @Autowired
@@ -86,5 +88,10 @@ public class ProjectDao {
         Object[] args = {u_id};
         List<Project> projects = new ArrayList<Project>(jdbcTemplate.query(QUERY_ALLPROJECT_1_OR_2,args,new BeanPropertyRowMapper<Project>(Project.class)));
         return  projects;
+    }
+
+    /*更新为删除（1，2）项目组最新项目状态为1*/
+    public void Update_NewestProjectsTo1(){
+        jdbcTemplate.execute(UPDATE_NEST_PROJECT_TO_1_SQL);
     }
 }

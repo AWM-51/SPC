@@ -1,10 +1,13 @@
 package com.wj.web;
 
+import com.sun.org.apache.xpath.internal.operations.Mod;
+import com.wj.domain.CheckItem;
 import com.wj.domain.Project;
 import com.wj.domain.User;
 import com.wj.service.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,13 +28,13 @@ public class DataController {
 
     @RequestMapping(value = "/entryExcel.html")
     public ModelAndView uploadExcel(HttpServletRequest request,HttpServletResponse response
-            ,MultipartFile  file) throws IOException, ParseException {
+            ,MultipartFile  file,Project project) throws IOException, ParseException {
         User user= (User) request.getSession().getAttribute("user");
-        String info=dataService.uploadExcelSuccess(file,user)==1?"upload success":"upload fail";
+        String info=dataService.uploadExcelSuccess(project,file,user)==1?"upload success":"upload fail";
 
         return new ModelAndView("main","info",info);
     }
-
+    @Transactional
     @RequestMapping(value = "/addNewProject.html")
     public ModelAndView addNewProject(int u_id,String p_name,String remarks,HttpServletRequest request,HttpServletResponse response) throws ParseException {
         dataService.creat_newProject(u_id,p_name,remarks);
@@ -39,7 +42,6 @@ public class DataController {
         List<Project> projects = new ArrayList<Project>();
         projects=dataService.get_All_ProjectInfoList(u_id);//获取该用户的所有项目，用于刷新
         System.out.println("添加的项目属于》》》》u_id="+u_id);
-        //request.getSession().setAttribute("user",user);
 
         if (!projects.isEmpty())
             request.getSession().setAttribute("projects",projects);
@@ -61,6 +63,48 @@ public class DataController {
         projects=dataService.get_All_ProjectInfoList(dataCommand.getU_id());//获取该用户的所有项目，用于刷新
         if (!projects.isEmpty())
             request.getSession().setAttribute("projects",projects);
+        return new ModelAndView("main");
+    }
+
+    @RequestMapping(value = "/addNewCheckItem.html")
+    public ModelAndView addNewCheckItem(HttpServletRequest request,int p_id,String c_name,String c_remarks){
+        try {
+
+            dataService.creat_newCheckItem(p_id,c_name,c_remarks);
+            List<CheckItem>checkItems =new ArrayList<CheckItem>();
+            checkItems = dataService.get_All_CheckItemInfoList(p_id);
+            System.out.println("添加的检查项目属于》》》》p_id="+p_id);
+            if(!checkItems.isEmpty())
+                request.setAttribute("checkItems",checkItems);
+            request.setAttribute("selected_p_id",p_id);
+            return new ModelAndView("main");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new ModelAndView("main");//发生错误也返回main页
+        }
+    }
+
+    @RequestMapping(value = "showCheckItem.html")
+    public ModelAndView showCheckItem(HttpServletRequest request , int p_id){
+        List<CheckItem> checkItems = new ArrayList<CheckItem>();
+        checkItems=dataService.get_All_CheckItemInfoList(p_id);
+        if (checkItems.isEmpty()){
+            request.setAttribute("is_null",1);
+            request.setAttribute("selected_p_id",p_id);
+            return new ModelAndView("main");
+        }
+        request.setAttribute("is_null",0);
+        request.setAttribute("checkItems",checkItems);
+        request.setAttribute("selected_p_id",p_id);
+        return new ModelAndView("main");
+    }
+
+    @RequestMapping (value = "deleteChtekItem.html")
+    public ModelAndView deleteCheckItem(HttpServletRequest request ,int c_id,int p_id){
+        dataService.deleteCheckItem(c_id);
+        List<CheckItem> checkItems = new ArrayList<CheckItem>();
+        checkItems=dataService.get_All_CheckItemInfoList(p_id);
+        request.setAttribute("checkItems",checkItems);
         return new ModelAndView("main");
     }
 }

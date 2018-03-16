@@ -1,13 +1,7 @@
 package com.wj.service;
 
-import com.wj.dao.DGroupDao;
-import com.wj.dao.ProjectDao;
-import com.wj.dao.SampleDataDao;
-import com.wj.dao.UploadSDExcelLogDao;
-import com.wj.domain.Project;
-import com.wj.domain.SampleData;
-import com.wj.domain.UploadSDExcelLog;
-import com.wj.domain.User;
+import com.wj.dao.*;
+import com.wj.domain.*;
 import com.wj.util.ReadExcel;
 import com.wj.util.SampleDataHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +27,8 @@ public class DataService {
     private ProjectDao projectDao;
     @Autowired
     private DGroupDao dGroupDao;
+    @Autowired
+    private CheckItemDao checkItemDao;
 
 
     /*
@@ -104,12 +100,14 @@ public class DataService {
 
     }
 
+
+
+    //-----------Project-------------------
     /*
     * 新增项目信息，同时更新其他正在使用的项目为未使用，即状态有1变为2
     * */
     @Transactional
     public void creat_newProject(int u_id,String project_name,String Remarks) throws ParseException {
-//        ProjectDao projectDao = new ProjectDao();
         Project project = new Project();
         Date entyrTime=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
                 .parse(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
@@ -137,11 +135,52 @@ public class DataService {
 
     /*删除某用户某项目，实际为该状态
     */
-
+    @Transactional
     public void deleteProject(int p_id){
         System.out.println("删除的项目id》》》"+p_id);
         projectDao.Update_Project_Status(p_id,0);
+        projectDao.Update_NewestProjectsTo1();
     }
+
+    //-------------CheckItem------------
+
+    /*
+    * 新增项目信息，同时更新其他正在使用的项目为未使用，即状态有1变为2
+    * */
+    @Transactional
+    public void creat_newCheckItem(int p_id,String c_name,String Remarks) throws ParseException {
+        CheckItem checkItem = new CheckItem();
+        /*先将所有已经存在的所有正在使用的项目变为未使用*/
+        checkItemDao.Update_AllCheckItem_1_to_2();
+        /*添加新的项目信息*/
+        checkItem.setC_name(c_name);
+        checkItem.setP_id(p_id);
+        checkItem.setC_status(1);
+        checkItem.setCurrent_num(0);
+        checkItem.setRemarks(Remarks);
+        checkItemDao.InsertCheckItem(checkItem);
+    }
+
+    /*
+    * 拉取用户下所有项目信息列表
+    * */
+    public List<CheckItem> get_All_CheckItemInfoList(int p_id){
+        List<CheckItem> checkItems = new ArrayList<CheckItem>(checkItemDao.Query_AllCheckItems_Info(p_id));
+
+        return checkItems;
+    }
+
+    /*删除某用户某项目，实际为该状态
+    */
+
+    public void deleteCheckItem(int c_id){
+        System.out.println("删除的项目id》》》"+c_id);
+
+        projectDao.Update_Project_Status(c_id,0);
+        projectDao.Update_NewestProjectsTo1();
+    }
+
+
 
 
 }
