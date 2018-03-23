@@ -3,6 +3,7 @@ package com.wj.web;
 import com.sun.org.apache.xpath.internal.operations.Mod;
 import com.wj.domain.CheckItem;
 import com.wj.domain.Project;
+import com.wj.domain.SampleData;
 import com.wj.domain.User;
 import com.wj.service.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,18 @@ public class DataController {
 
     @RequestMapping(value = "/entryExcel.html")
     public ModelAndView uploadExcel(HttpServletRequest request,HttpServletResponse response
-            ,MultipartFile  file,Project project) throws IOException, ParseException {
+            ,MultipartFile  file,CheckItem checkItem,int c_id,int p_id) throws IOException, ParseException {
         User user= (User) request.getSession().getAttribute("user");
-        String info=dataService.uploadExcelSuccess(project,file,user)==1?"upload success":"upload fail";
+        String info=dataService.uploadExcelSuccess(checkItem,file,user)==1?"upload success":"upload fail";
+
+        List<List<SampleData>> sampleDataList = dataService.getAllDataInCheckItem(c_id);
+        CheckItem checkItem1 = dataService.get_CheckItem(c_id);
+        List<CheckItem> checkItems=dataService.get_All_CheckItemInfoList(p_id);
+        request.setAttribute("showedCheckItem",checkItem1);
+        request.setAttribute("checkItems",checkItems);
+        request.setAttribute("sampleDataList",sampleDataList);
+        request.setAttribute("selected_p_id",p_id);
+        request.setAttribute("selected_c_id",c_id);
 
         return new ModelAndView("main","info",info);
     }
@@ -84,7 +94,7 @@ public class DataController {
         }
     }
 
-    @RequestMapping(value = "showCheckItem.html")
+    @RequestMapping(value = "/showCheckItem.html")
     public ModelAndView showCheckItem(HttpServletRequest request , int p_id){
         List<CheckItem> checkItems = new ArrayList<CheckItem>();
         checkItems=dataService.get_All_CheckItemInfoList(p_id);
@@ -99,12 +109,40 @@ public class DataController {
         return new ModelAndView("main");
     }
 
-    @RequestMapping (value = "deleteChtekItem.html")
+    @RequestMapping (value = "/deleteChtekItem.html")
     public ModelAndView deleteCheckItem(HttpServletRequest request ,int c_id,int p_id){
         dataService.deleteCheckItem(c_id);
         List<CheckItem> checkItems = new ArrayList<CheckItem>();
         checkItems=dataService.get_All_CheckItemInfoList(p_id);
         request.setAttribute("checkItems",checkItems);
         return new ModelAndView("main");
+
+
+    }
+
+    @RequestMapping (value = "/showDataTable.html")
+    public ModelAndView showDataTable(HttpServletRequest request ,int c_id,int p_id){
+        List<List<SampleData>> sampleDataList = dataService.getAllDataInCheckItem(c_id);
+        CheckItem checkItem = dataService.get_CheckItem(c_id);
+        List<CheckItem> checkItems=dataService.get_All_CheckItemInfoList(p_id);
+        request.setAttribute("showedCheckItem",checkItem);
+        request.setAttribute("checkItems",checkItems);
+        request.setAttribute("sampleDataList",sampleDataList);
+        request.setAttribute("selected_p_id",p_id);
+        request.setAttribute("selected_c_id",c_id);
+        return new ModelAndView("main");
+    }
+
+    @RequestMapping(value = "/gotoTable.html")
+    public ModelAndView gotoTable(HttpServletRequest request){
+        List<Integer> data = new ArrayList<Integer>();
+        data.add(5);
+        data.add(25);
+        data.add(35);
+        data.add(15);
+        data.add(55);
+        data.add(10);
+        request.setAttribute("data",data);
+        return new ModelAndView("tables");
     }
 }

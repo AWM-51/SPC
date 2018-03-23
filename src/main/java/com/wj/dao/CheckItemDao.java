@@ -1,7 +1,9 @@
 package com.wj.dao;
 
 import com.wj.domain.CheckItem;
+import com.wj.domain.D_Group;
 import com.wj.domain.Project;
+import com.wj.domain.SampleData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,13 +16,17 @@ import java.util.List;
 public class CheckItemDao {
     private JdbcTemplate jdbcTemplate = new JdbcTemplate();
 
-    private final static String INSERT_ITEM_SQL="INSERT INTO checked_item (p_id , c_name , c_status , remarks) VALUES (?,?,?,?)";
+    private final static String INSERT_ITEM_SQL="INSERT INTO checked_item (p_id , c_name , c_status ,current_num, remarks) VALUES (?,?,?,?,?)";
     private final static String UPDATE_CHECKITEM_STATUS_SQL="UPDATE checked_item SET c_status = ? WHERE c_id = ?";
     private final static String UPDATE_ALLCHECKITEM_STATUS_1_TO_2="UPDATE checked_item SET c_status = 2 WHERE c_status = 1";
     private final static String QUERY_ALLChECKITEM_1_OR_2="SELECT * FROM checked_item WHERE p_id = ? AND (c_status =1 OR c_status =2)";
+    private final static String GET_G_ID_LIST_SQL="SELECT * From d_group_info WHERE c_id=?";
     private final static String UPDATE_NEST_CHECKITEM_TO_1_SQL="UPDATE checked_item SET c_status=1 WHERE c_id " +
             " = (SELECT c_id FROM (SELECT c_id FROM checked_item WHERE c_status=1 OR c_status=2 ORDER BY c_id DESC " +
             "LIMIT 1) a )";
+    private final static String GET_CHECKITEM_SQL="SELECT * FROM checked_item WHERE c_id=?";
+
+    private final static String GET_ALL_DATA_SQL="SELECT * From d_group_info LEFT JOIN sampleData ON d_group_info.g_id = sampleData.g_id WHERE d_group_info.c_id = ?";
     @Autowired
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate=jdbcTemplate;
@@ -28,7 +34,7 @@ public class CheckItemDao {
 
     /*插入检查项目*/
     public void InsertCheckItem(CheckItem checkItem){
-        Object[] args = {checkItem.getP_id(),checkItem.getC_name(),checkItem.getC_status(),checkItem.getRemarks()};
+        Object[] args = {checkItem.getP_id(),checkItem.getC_name(),checkItem.getC_status(),checkItem.getCurrent_num(),checkItem.getRemarks()};
         try{
             jdbcTemplate.update(INSERT_ITEM_SQL,args);
         }
@@ -71,4 +77,29 @@ public class CheckItemDao {
         }
         return  checkItems;
     }
+    /*获取该检查项目下所有样本数据对象
+     */
+    public List<SampleData> Get_AllDataInCheckItem(int c_id){
+        Object[] args = {c_id};
+        List<SampleData> sampleDataList = new ArrayList<SampleData>();
+        sampleDataList=jdbcTemplate.query(GET_ALL_DATA_SQL,args,new BeanPropertyRowMapper<SampleData>(SampleData.class));
+        return sampleDataList;
+    }
+    /*获取所有组的id*/
+    public List<D_Group> get_Group_In_CheckItem(int c_id){
+        Object[] args = {c_id};
+        List<D_Group> c_idList=jdbcTemplate.query(GET_G_ID_LIST_SQL,args,new BeanPropertyRowMapper<D_Group>(D_Group.class));
+        return c_idList;
+    }
+
+    /*获取检查项目*/
+    public CheckItem get_CheckItem(int c_id){
+        Object[] args = {c_id};
+        List<CheckItem> checkItem=jdbcTemplate.query(GET_CHECKITEM_SQL,args,new BeanPropertyRowMapper<CheckItem>(CheckItem.class));
+        if(checkItem.isEmpty())
+            return null;
+        else
+            return checkItem.get(0);
+    }
+
 }

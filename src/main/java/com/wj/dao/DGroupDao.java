@@ -10,9 +10,10 @@ public class DGroupDao {
 
     private JdbcTemplate jdbcTemplate = new JdbcTemplate();
     private String UPDATE_DGROUP_INFO_SQL="";
-    private String INSERT_DGROUP_SQL="INSERT INTO d_group_info ( c_id ,g_status , obtain_time , creat_time ) " +
+    private String INSERT_DGROUP_SQL="INSERT INTO d_group_info ( c_id ,g_status , obtain_time , create_time ) " +
             "VALUES (?,?,?,?)";
     private String GET_GROUP_COUNT_SQL="SELECT COUNT(*) FROM d_group_info WHERE c_id = ?";
+    private String GET_NEST_GROUP_ID_SQL="SELECT g_id FROM d_group_info ORDER BY g_id DESC LIMIT 1";
     @Autowired
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate=jdbcTemplate;
@@ -47,5 +48,11 @@ public class DGroupDao {
             System.out.println(ex);
         }
         return count;
+    }
+
+    /*获取最新的g_id*/
+    public int get_NewestG_id(){
+        int g_id = Integer.valueOf(jdbcTemplate.queryForMap(GET_NEST_GROUP_ID_SQL).get("g_id").toString());
+        return g_id;
     }
 }

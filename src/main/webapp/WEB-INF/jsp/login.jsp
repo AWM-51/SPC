@@ -32,7 +32,9 @@
     <font color="red"><c:out value="${error}"/></font>
 </c:if>
 <div class="row">
-    <div class="col-md-3"></div>
+    <div class="col-md-3">
+        <a href="/gotoTable.html">table--------------</a>
+    </div>
     <div class="col-md-6">
         <form action="<c:url value='/loginCheck.html'/>"method="post">
             用户名：

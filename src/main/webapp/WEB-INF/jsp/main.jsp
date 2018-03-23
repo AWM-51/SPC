@@ -95,28 +95,6 @@
                 &u_id=${user.userId}" class="list-group-item">删除</a>
             </c:forEach>
         </div>
-        <%--<ol start="1">--%>
-            <%--<c:forEach var="i" begin="0" end="${projects.size()-1}">--%>
-                <%--<input action="<c:url value='/showCheckItem.html'/>"  method="post" enctype="multipart/form-data" th:method="GET">--%>
-                <%--<li>--%>
-                    <%--项目名称：<input type="submit" value="${projects.get(i).getP_name()}"/>--%>
-                    <%--<input type="hidden" name="p_id" value=${projects.get(i).getP_id()}/>--%>
-                <%--</li>--%>
-                <%--</form>--%>
-                <%--创建时间：${projects.get(i).getCreate_time()}--%>
-
-                <%--<form action="<c:url value='/deleteProject.html'/>">--%>
-                    <%--<input type="hidden" name="project.p_id" value="${projects.get(i).getP_id()}"/>--%>
-                    <%--<input type="hidden" name="project.p_status" value="${projects.get(i).getP_status()}"/>--%>
-                    <%--<input type="hidden" name="u_id" value="${user.userId}">--%>
-                    <%--<input type="submit" value="删除" name="delete"/>--%>
-                <%--</form>--%>
-
-
-
-            <%--</c:forEach>--%>
-        <%--</ol>--%>
-
     <form action="<c:url value='/addNewProject.html'/>" method="post" enctype="multipart/form-data" th:method="GET"
     >
         项目名：<input type="text" name="p_name"/>
@@ -133,7 +111,7 @@
     <div class="list-group">
 
         <c:forEach var="i" begin="0" end="${checkItems.size()-1}">
-            <a href="/showData.html?p_id=${checkItems.get(i).getC_id()}" class="list-group-item active">
+            <a href="/showDataTable.html?c_id=${checkItems.get(i).getC_id()}&p_id=${selected_p_id}" class="list-group-item active">
                 <h4 class="list-group-item-heading">
                         ${checkItems.get(i).getC_name()}
                 </h4>
@@ -160,29 +138,43 @@
 <div class="col-md-6">
 
     <%--表格--%>
+        <c:if test="${empty sampleDataList or empty showedCheckItem}">  <h1>还未请求数据</h1></c:if>
+        <c:if test="${not empty sampleDataList and not empty showedCheckItem}">
         <table class="table table-hover">
             <!-- On rows -->
             <tr class="active">序号</tr>
             <tr class="success">属性</tr>
-            <tr class="warning">数据1</tr>
-            <tr class="danger">数据2</tr>
-            <tr class="info">数据3</tr>
+            <tr class="warning"> 抽检时间</tr>
+            <tr class="danger">数据1</tr>
+            <tr class="info">数据2</tr>
+            <tr class="danger">数据3</tr>
+            <tr class="info">数据4</tr>
+            <tr class="danger">数据5</tr>
+
 
             <!-- On cells (`td` or `th`) -->
+            <c:forEach var="i" begin="0" end="${sampleDataList.size()-1}">
             <tr>
-                <td class="active">...</td>
-                <td class="success">...</td>
-                <td class="warning">...</td>
-                <td class="danger">...</td>
-                <td class="info">...</td>
+                <td class="active">${i+1}</td>
+                <td class="success">${showedCheckItem.getC_name()}</td>
+                <td class="warning">${sampleDataList.get(i).get(0).getObtain_time()}</td>
+                <c:forEach var="j" begin="0" end="${sampleDataList.get(i).size()-1}">
+                    <td class="info">${sampleDataList.get(i).get(j).getValue()}</td>
+                </c:forEach>
             </tr>
+            </c:forEach>
         </table>
 
-    <form  action="<c:url value='/entryExcel.html'/>"method="post" enctype="multipart/form-data" th:method="GET"
-           onsubmit="return check1(this)">
-        <input type="file" name="file">
-        <input type="submit" value="导入excel" >
-    </form>
+
+        </c:if>
+        <form  action="<c:url value='/entryExcel.html'/>"method="post" enctype="multipart/form-data" th:method="GET"
+               onsubmit="return check1(this)">
+            <input type="hidden" name='c_id' value=${selected_c_id}>
+            <input type="hidden" name='p_id' value=${selected_p_id}>
+            <input type="file" name="file">
+            <input type="submit" value="导入excel" >
+        </form>
+
 </div>
 
 

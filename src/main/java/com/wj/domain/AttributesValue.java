@@ -2,13 +2,17 @@ package com.wj.domain;
 
 public class AttributesValue {
     private int id;
-    private int type_id;
-    private int f_id;
+    private int type_id;//什么类型的状态值 1：project  2：checkitem 3：group  4：sampledata
+    private int f_id;//与tepe_id对应选取值
     private Double averageValue;
     private Double variance;
     private Double standardDeviation;
     private Double MAX;
     private Double MIN;
+
+    private Double Ca;
+    private Double Cp;
+    private Double CPK;
 
     public int getId() {
         return id;
@@ -98,9 +102,6 @@ public class AttributesValue {
         this.CPK = CPK;
     }
 
-    private Double Ca;
-    private Double Cp;
-    private Double CPK;
 
 
 

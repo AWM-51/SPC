@@ -36,7 +36,7 @@ public class DataService {
     *
     * */
     @Transactional
-    public int uploadExcelSuccess(Project project,MultipartFile file, User user) throws IOException, ParseException {
+    public int uploadExcelSuccess(CheckItem checkItem,MultipartFile file, User user) throws IOException, ParseException {
         if(file.isEmpty()){
             return 0;
         }
@@ -54,26 +54,30 @@ public class DataService {
                 .parse(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
                         .format(new Date()));//数据样本录入时间
 
-        try{
+//        try{
             List<List<SampleData>> sampleDatas = readExcel.readXls(file,entyrTime);//读入表格
             int datanum= sampleDatas.size();//样本数据组数量
             do_ExcelUpload_Log(entyrTime,uploadUserId,fileName,datanum);//将上传日志相关信息传入数据库
             uploadSDExcelLog=sampleDataDao.selectUploadExcelID(entyrTime);//目的是从数据库中将与entryTime相同的日志取出，使用他的id
 
-            for(List<SampleData> sd : sampleDatas){
 
 
+            for(List<SampleData> sd : sampleDatas) {
+                D_Group d_group = new D_Group();
+                d_group.setC_id(checkItem.getC_id());
+                d_group.setCreate_time(entyrTime.toString());
+                d_group.setObtain_time(sd.get(0).getObtain_time());
+                dGroupDao.InsertInto_DGroupInfo(d_group);
 
-//                sd.setAverage_value(sampleDataHandler.get_stanardData(sampleDataHandler.get_average(sd)));//在SampleData插入数据库前就将平均值算出。
-//                sd.setVariance(sampleDataHandler.get_stanardData(sampleDataHandler.get_variance(sd)));//在SampleData插入数据库前就将方差算出。
-//                sd.setStandard_Deviation(sampleDataHandler.get_stanardData(sampleDataHandler.get_standard_Deviation(sd)));//在SampleData插入数据库前就将标准差算出。
-//
-//                sampleDataDao.insertSampleData(sd,uploadSDExcelLog.getUploadSDExcel_log_id());//插入数据至数据库
+                for (SampleData d : sd) {
+                    SampleData data = new SampleData();
+                    data.setG_id(dGroupDao.get_NewestG_id());
+                    data.setObtain_time(d.getObtain_time());
+                    data.setValue(sampleDataHandler.get_stanardData(d.getValue()));
+                    data.setS_status(2);
+                    sampleDataDao.insertSampleData(data);
+                }
             }
-        }catch (NullPointerException ex){
-            System.out.println(ex);
-
-        }
 
 
         return 1;
@@ -180,7 +184,52 @@ public class DataService {
         projectDao.Update_NewestProjectsTo1();
     }
 
+//----------data---------------
+    /*获取该checkeditem 所有数据并转成json*/
+    public List<List<SampleData>> getAllDataInCheckItem(int c_id){
+        System.out.println(c_id);
+        List<List<SampleData>> list_2=null;
+        List<SampleData> sampleDataList = checkItemDao.Get_AllDataInCheckItem(c_id);
+        List<D_Group> g_idList=checkItemDao.get_Group_In_CheckItem(c_id);
+        list_2=new ArrayList<List<SampleData>>();
+        if(sampleDataList.isEmpty()||g_idList.isEmpty() )
+            return null;
+        else {
+            int i = 0;
+            for(D_Group c : g_idList){
+                List<SampleData> tempSDList = new ArrayList<SampleData>();
+                for (SampleData sd : sampleDataList){
 
+                    if(sd.getG_id() == c.getG_id()){
+                        tempSDList.add(sd);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+                list_2.add(tempSDList);
+                ++i;
+            }
+
+            return list_2;
+        }
+
+    }
+    /*获取抽检属性名称*/
+    public CheckItem get_CheckItem(int c_id){
+        CheckItem checkItem=new CheckItem();
+        checkItem=checkItemDao.get_CheckItem(c_id);
+        return checkItem;
+    }
+
+//    public static void main(String[] args) {
+//        List<List<SampleData>> sampleData = getAllDataInCheckItem(5);
+//        for(List<SampleData> sd : sampleData){
+//            System.out.println("-->"+sd.getValue());
+//
+//        }
+//
+//    }
 
 
 }

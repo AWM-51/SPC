@@ -8,10 +8,13 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -33,27 +36,36 @@ public class ReadExcel {
         for (int numSheet = 0; numSheet < XSSFWorkbook.getNumberOfSheets(); numSheet++) {
             XSSFSheet XSSFSheet = XSSFWorkbook.getSheetAt(numSheet);
            // d_group=new D_Group();//数据组定义
-            List<SampleData> g_list = new ArrayList<SampleData>();//每一行（组）数据放到一个列表中
             if (XSSFSheet == null) {
                 continue;
             }
             // 循环行Row
             for (int rowNum = 1; rowNum <= XSSFSheet.getLastRowNum(); rowNum++) {
                 XSSFRow XSSFRow = XSSFSheet.getRow(rowNum);
+                List<SampleData> g_list = new ArrayList<SampleData>();//每一行（组）数据放到一个列表中
                 if (XSSFRow != null) {
-                    SampleData = new SampleData();
-                    try {
-                        int i=1;
-                        if (XSSFRow.getCell(i).toString().isEmpty()){
-                            continue;
+
+                   // try {
+
+                        int i=2;
+                        while(true){
+                            SampleData = new SampleData();
+                            XSSFCell D_dataCell = XSSFRow.getCell(1);
+                            SampleData.setObtain_time(daysTodate(getValue(D_dataCell).toString()));//获取抽检时间
+
+                            if (XSSFRow.getCell(i)==null){
+                                break;
+                            }
+                            XSSFCell dataCell = XSSFRow.getCell(i);
+                            SampleData.setValue(Double.valueOf(getValue(dataCell)));
+                            g_list.add(SampleData);
+                            ++i;
                         }
-                        XSSFCell dataCell = XSSFRow.getCell(i);
-                        SampleData.setValue(Double.valueOf(getValue(dataCell)));
-                        g_list.add(SampleData);
-                    }catch (NullPointerException ex){
-                        System.out.println(ex);
-                        continue;
-                    }
+
+//                    }catch (NullPointerException ex){
+//                        System.out.println(ex);
+//                        continue;
+//                    }
                 }
                 list.add(g_list);
             }
@@ -80,4 +92,24 @@ public class ReadExcel {
             return String.valueOf(XSSFCell.getStringCellValue());
         }
     }
+
+
+    public static String daysTodate(String days) throws ParseException {
+        long dayMount = Integer.valueOf(days.substring(0,5));
+        long addMill = (dayMount-25569)*24*3600;
+        System.out.println("s:"+addMill);
+        return stampToDate(addMill);
+
+    }
+    public static String stampToDate(long lt) throws ParseException {
+        SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd");
+        Long time=new Long(lt*1000);
+        String d = format.format(time);
+        Date date=format.parse(d);
+        System.out.println("Format To String(Date):"+d);
+        System.out.println("Format To Date:"+date);
+        return d;
+    }
+
+
 }
