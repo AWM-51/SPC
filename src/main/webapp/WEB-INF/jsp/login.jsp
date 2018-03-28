@@ -33,7 +33,7 @@
 </c:if>
 <div class="row">
     <div class="col-md-3">
-        <a href="/gotoTable.html">table--------------</a>
+        <%--<a href="/gotoTable.html">table--------------</a>--%>
     </div>
     <div class="col-md-6">
         <form action="<c:url value='/loginCheck.html'/>"method="post">
@@ -61,6 +61,6 @@
 <!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->
 <script src="https://code.jquery.com/jquery.js"></script>
 <!-- 包括所有已编译的插件 -->
-<script src="js/bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>

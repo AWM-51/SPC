@@ -21,12 +21,14 @@ public class CheckItemDao {
     private final static String UPDATE_ALLCHECKITEM_STATUS_1_TO_2="UPDATE checked_item SET c_status = 2 WHERE c_status = 1";
     private final static String QUERY_ALLChECKITEM_1_OR_2="SELECT * FROM checked_item WHERE p_id = ? AND (c_status =1 OR c_status =2)";
     private final static String GET_G_ID_LIST_SQL="SELECT * From d_group_info WHERE c_id=?";
+    private final static String SELECT_NEST_CHECKITEM_SQL="SELECT * FROM (SELECT c_id FROM checked_item WHERE (c_status=1 OR c_status=2) AND p_id = ? ORDER BY c_id DESC LIMIT 1) a";
     private final static String UPDATE_NEST_CHECKITEM_TO_1_SQL="UPDATE checked_item SET c_status=1 WHERE c_id " +
-            " = (SELECT c_id FROM (SELECT c_id FROM checked_item WHERE c_status=1 OR c_status=2 ORDER BY c_id DESC " +
+            " = (SELECT c_id FROM (SELECT c_id FROM checked_item WHERE (c_status=1 OR c_status=2)AND p_id = ? ORDER BY c_id DESC " +
             "LIMIT 1) a )";
     private final static String GET_CHECKITEM_SQL="SELECT * FROM checked_item WHERE c_id=?";
 
     private final static String GET_ALL_DATA_SQL="SELECT * From d_group_info LEFT JOIN sampleData ON d_group_info.g_id = sampleData.g_id WHERE d_group_info.c_id = ?";
+
     @Autowired
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate=jdbcTemplate;
@@ -50,7 +52,7 @@ public class CheckItemDao {
     *                   1=当前正在使用中
     *                   2=未使用
     *                   3=将不被使用，软删除*/
-    public void Update_Project_Status(int c_id,int status){
+    public void Update_CheckItem_Status(int c_id,int status){
         Object[] args = {status,c_id};
         jdbcTemplate.update(UPDATE_CHECKITEM_STATUS_SQL,args);
     }
@@ -100,6 +102,22 @@ public class CheckItemDao {
             return null;
         else
             return checkItem.get(0);
+    }
+
+    /*获取最新检查项目*/
+    public CheckItem get_nest_CheckItem(int p_id){
+        Object[] args = {p_id};
+        List<CheckItem> checkItem=jdbcTemplate.query(SELECT_NEST_CHECKITEM_SQL,args,new BeanPropertyRowMapper<CheckItem>(CheckItem.class));
+        if(checkItem.isEmpty())
+            return null;
+        else
+            return checkItem.get(0);
+    }
+
+    /*将最新一条记录更新为正在使用*/
+    public void Update_NestCheckitem2_to1(int p_id){
+        Object[] args = {p_id};
+        jdbcTemplate.update(UPDATE_NEST_CHECKITEM_TO_1_SQL,args);
     }
 
 }

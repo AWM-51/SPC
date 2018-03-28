@@ -21,7 +21,7 @@
 <ol class="breadcrumb">
     <li><a href="/gotoMain.html?u_id=${user.userId}">Home</a></li>
     <li><a href="/showCheckItem.html?p_id=${selected_p_id}">CheckItem</a></li>
-    <li class="active">样本运行图</li>
+    <li class="active">CPk趋势图</li>
 </ol>
 <!-- Single button -->
 <div class="jumbotron">
@@ -29,7 +29,7 @@
 </div>
 <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
 <div id="main" style="width: 1000px;height:400px;"></div>
-<h1>整体cpk:${cpk}</h1>
+
 <script type="text/javascript">
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('main'));
@@ -37,44 +37,38 @@
     // 指定图表的配置项和数据
     var option = {
         title: {
-            text: '样本运行图'
+            text: 'CPK运行图'
         },
         tooltip: {},
         legend: {
-            data:[' 样本数据']
+            data:[' CPK数据']
         },
         xAxis: {
             data: ${xList}
         },
         yAxis: {
             min:0,
-            max:${max*1.5},
+            max:${max},
             scale:true
         },
         series: [{
-            name: '样本数据',
+            name: 'CPk数据',
             type: 'line',
             color:"black",
-            data: ${SVlaueList},
-            markPoint : {
-                data : [
-                    // 纵轴，默认
-                    {type : 'max', name: '最大值',symbol: 'emptyCircle', itemStyle:{normal:{color:'#dc143c',label:{position:'top'}}}},
-                    {type : 'min', name: '最小值',symbol: 'emptyCircle', itemStyle:{normal:{color:'#dc143c',label:{position:'bottom'}}}},
-                    // 横轴
-                    {type : 'max', name: '最大值', valueIndex: 0, symbol: 'emptyCircle', itemStyle:{normal:{color:'#1e90ff',label:{position:'right'}}}},
-                    {type : 'min', name: '最小值', valueIndex: 0, symbol: 'emptyCircle', itemStyle:{normal:{color:'#1e90ff',label:{position:'left'}}}}
-                ]
-            },
+            data: ${CPkList},
+//            markPoint : {
+//                data : [
+//                    // 纵轴，默认
+//                    {type : 'max', name: '无缺点考虑降低成本',symbol: 'emptyCircle', itemStyle:{normal:{color:'#dc143c',label:{position:'top'}}}},
+//                    {type : 'min', name: '最小值',symbol: 'emptyCircle', itemStyle:{normal:{color:'#dc143c',label:{position:'bottom'}}}},
+//                ]
+//            },
             markLine : {
                 data : [
                     // 纵轴，默认
-                    {type : 'max', name: '最大值', itemStyle:{normal:{color:'#dc143c'}}},
-                    {type : 'min', name: '最小值', itemStyle:{normal:{color:'#dc143c'}}},
-                    {type : 'average', name : '平均值', itemStyle:{normal:{color:'#dc143c'}}},
                     {
-                        name: 'USL',
-                        yAxis: ${USL},
+                        name: '无缺点考虑降低成本',
+                        yAxis: 1.67,
                         itemStyle : {
                             normal : {
                                 lineStyle:{
@@ -93,8 +87,8 @@
                         }
                     },
                     {
-                        name: 'LSL',
-                        yAxis: ${LSL},
+                        name: '状态良好维持现状',
+                        yAxis: 1.33,
                         itemStyle : {
                             normal : {
                                 lineStyle:{
@@ -114,8 +108,8 @@
                     }
                     ,
                     {
-                        name: 'tragetValue',
-                        yAxis: ${U},
+                        name: '改进为A级',
+                        yAxis: 1.0,
                         itemStyle : {
                             normal : {
                                 lineStyle:{
@@ -133,10 +127,51 @@
                             }
                         }
                     }
-//                    // 横轴
-//                    {type : 'max', name: '最大值', valueIndex: 0, itemStyle:{normal:{color:'#1e90ff'}}},
-//                    {type : 'min', name: '最小值', valueIndex: 0, itemStyle:{normal:{color:'#1e90ff'}}},
-//                    {type : 'average', name : '平均值', valueIndex: 0, itemStyle:{normal:{color:'#1e90ff'}}}
+                    ,
+                    {
+                        name: '制程不良较多,必须提升其能力',
+                        yAxis: 0.67,
+                        itemStyle : {
+                            normal : {
+                                lineStyle:{
+                                    color:'green',
+                                    type:'solid'  //'dotted'虚线 'solid'实线
+                                },
+
+                                label:{
+                                    show: true,
+                                    formatter: '{b} : {c}' ,
+                                    color:"green",
+                                    position: 'middle',/*****文字显示的位置**********/
+                                },
+                                labelLine :{show:true}
+                            }
+                        }
+                    }
+
+
+                    ,
+                    {
+                        name: '制程能力较差，考虑整改设计制程',
+                        yAxis: 0.67,
+                        itemStyle : {
+                            normal : {
+                                lineStyle:{
+                                    color:'green',
+                                    type:'solid'  //'dotted'虚线 'solid'实线
+                                },
+
+                                label:{
+                                    show: true,
+                                    formatter: '{b} : {c}' ,
+                                    color:"green",
+                                    position: 'middle',/*****文字显示的位置**********/
+                                },
+                                labelLine :{show:true}
+                            }
+                        }
+                    }
+
                 ]
             }
         }

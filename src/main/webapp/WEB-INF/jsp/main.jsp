@@ -72,13 +72,17 @@
 </div>
 
 <body>
-
-<div class="col-md-3">
+<ol class="breadcrumb">
+    <li class="active">Home</li>
+</ol>
+<%--<div class="col-md-3"></div>--%>
+<div class="col-md-3"></div>
+<div class="col-md-6">
     <%--项目--%>
 
         <div class="list-group">
             <c:forEach var="i" begin="0" end="${projects.size()-1}">
-            <a href="/showCheckItem.html?p_id=${projects.get(i).getP_id()}" class="list-group-item active">
+            <a href="/showCheckItem.html?p_id=${projects.get(i).getP_id()}&u_id=${user.userId}" class="list-group-item active">
                 <h4 class="list-group-item-heading">
                      ${projects.get(i).getP_name()}
                 </h4>
@@ -105,79 +109,85 @@
 
 
 </div>
-<div class="col-md-3">
-    <c:if test="${empty checkItems}">  <h1>为选择项目或请在该项目中添加检查属性</h1></c:if>
-    <c:if test="${not empty checkItems}">
-    <div class="list-group">
+<%--&lt;%&ndash;<div class="col-md-3"></div>&ndash;%&gt;--%>
+<%--<div class="col-md-3">--%>
+    <%--<c:if test="${empty checkItems}">  <h1>为选择项目或请在该项目中添加检查属性</h1></c:if>--%>
+    <%--<c:if test="${not empty checkItems}">--%>
+    <%--<div class="list-group">--%>
 
-        <c:forEach var="i" begin="0" end="${checkItems.size()-1}">
-            <a href="/showDataTable.html?c_id=${checkItems.get(i).getC_id()}&p_id=${selected_p_id}" class="list-group-item active">
-                <h4 class="list-group-item-heading">
-                        ${checkItems.get(i).getC_name()}
-                </h4>
-            </a>
-            <a href="/deleteChtekItem.html?p_id=${selected_p_id}
-                &c_id=${checkItems.get(i).getC_id()}" class="list-group-item">删除</a>
-        </c:forEach>
-    </div>
-    </c:if>
-
-
-    <c:if test="${not empty selected_p_id}">
-    <form action="<c:url value='/addNewCheckItem.html'/>" method="post" enctype="multipart/form-data" th:method="GET"
-    >
-        项目名：<input type="text" name="c_name"/>
-        备注：<input type="text" name="c_remarks"/>
-        <input type="hidden" name="p_id" value=${selected_p_id}>
-        <input type="submit" value="新增测试属性 to ${selected_p_id}" onclick="check2()">
-    </form>
-    </c:if>
-</div>
+        <%--<c:forEach var="i" begin="0" end="${checkItems.size()-1}">--%>
+            <%--<a href="/showDataTable.html?c_id=${checkItems.get(i).getC_id()}&p_id=${selected_p_id}" class="list-group-item active">--%>
+                <%--<c:if test="${checkItems.get(i).getC_status() == 1}">--%>
+                <%--<h4 class="list-group-item-heading" style="color: red">--%>
+                    <%--</c:if>--%>
+                    <%--<c:if test="${checkItems.get(i).getC_status() != 1}">--%>
+                        <%--<h4 class="list-group-item-heading">--%>
+                            <%--</c:if>--%>
+                        <%--${checkItems.get(i).getC_name()}--%>
+                <%--</h4>--%>
+            <%--</a>--%>
+            <%--<a href="/deleteChtekItem.html?p_id=${selected_p_id}--%>
+                <%--&c_id=${checkItems.get(i).getC_id()}" class="list-group-item">删除</a>--%>
+        <%--</c:forEach>--%>
+    <%--</div>--%>
+    <%--</c:if>--%>
 
 
-<div class="col-md-6">
-
-    <%--表格--%>
-        <c:if test="${empty sampleDataList or empty showedCheckItem}">  <h1>还未请求数据</h1></c:if>
-        <c:if test="${not empty sampleDataList and not empty showedCheckItem}">
-        <table class="table table-hover">
-            <!-- On rows -->
-            <tr class="active">序号</tr>
-            <tr class="success">属性</tr>
-            <tr class="warning"> 抽检时间</tr>
-            <tr class="danger">数据1</tr>
-            <tr class="info">数据2</tr>
-            <tr class="danger">数据3</tr>
-            <tr class="info">数据4</tr>
-            <tr class="danger">数据5</tr>
+    <%--<c:if test="${not empty selected_p_id}">--%>
+    <%--<form action="<c:url value='/addNewCheckItem.html'/>"  enctype="multipart/form-data" th:method="GET"--%>
+    <%-->--%>
+        <%--项目名：<input type="text" name="c_name"/>--%>
+        <%--备注：<input type="text" name="c_remarks"/>--%>
+        <%--<input type="hidden" name="p_id" value=${selected_p_id}>--%>
+        <%--<input type="submit" value="新增测试属性 to ${selected_p_id}" onclick="check2()">--%>
+    <%--</form>--%>
+    <%--</c:if>--%>
+<%--</div>--%>
 
 
-            <!-- On cells (`td` or `th`) -->
-            <c:forEach var="i" begin="0" end="${sampleDataList.size()-1}">
-            <tr>
-                <td class="active">${i+1}</td>
-                <td class="success">${showedCheckItem.getC_name()}</td>
-                <td class="warning">${sampleDataList.get(i).get(0).getObtain_time()}</td>
-                <c:forEach var="j" begin="0" end="${sampleDataList.get(i).size()-1}">
-                    <td class="info">${sampleDataList.get(i).get(j).getValue()}</td>
-                </c:forEach>
-            </tr>
-            </c:forEach>
-        </table>
+<%--<div class="col-md-6">--%>
+
+    <%--&lt;%&ndash;表格&ndash;%&gt;--%>
+        <%--<c:if test="${empty sampleDataList or empty showedCheckItem}">  <h1>还未请求数据</h1></c:if>--%>
+        <%--<c:if test="${not empty sampleDataList and not empty showedCheckItem}">--%>
+        <%--<table class="table table-hover">--%>
+            <%--<!-- On rows -->--%>
+            <%--<tr class="active">序号</tr>--%>
+            <%--<tr class="success">属性</tr>--%>
+            <%--<tr class="warning"> 抽检时间</tr>--%>
+            <%--<tr class="danger">数据1</tr>--%>
+            <%--<tr class="info">数据2</tr>--%>
+            <%--<tr class="danger">数据3</tr>--%>
+            <%--<tr class="info">数据4</tr>--%>
+            <%--<tr class="danger">数据5</tr>--%>
 
 
-        </c:if>
-        <form  action="<c:url value='/entryExcel.html'/>"method="post" enctype="multipart/form-data" th:method="GET"
-               onsubmit="return check1(this)">
-            <input type="hidden" name='c_id' value=${selected_c_id}>
-            <input type="hidden" name='p_id' value=${selected_p_id}>
-            <input type="file" name="file">
-            <input type="submit" value="导入excel" >
-        </form>
+            <%--<!-- On cells (`td` or `th`) -->--%>
+            <%--<c:forEach var="i" begin="0" end="${sampleDataList.size()-1}">--%>
+            <%--<tr>--%>
+                <%--<td class="active">${i+1}</td>--%>
+                <%--<td class="success">${showedCheckItem.getC_name()}</td>--%>
+                <%--<td class="warning">${sampleDataList.get(i).get(0).getObtain_time()}</td>--%>
+                <%--<c:forEach var="j" begin="0" end="${sampleDataList.get(i).size()-1}">--%>
+                    <%--<td class="info">${sampleDataList.get(i).get(j).getValue()}</td>--%>
+                <%--</c:forEach>--%>
+            <%--</tr>--%>
+            <%--</c:forEach>--%>
+        <%--</table>--%>
 
-</div>
 
+        <%--</c:if>--%>
+        <%--<form  action="<c:url value='/entryExcel.html'/>"method="post" enctype="multipart/form-data" th:method="GET"--%>
+               <%--onsubmit="return check1(this)">--%>
+            <%--<input type="hidden" name='c_id' value=${selected_c_id}>--%>
+            <%--<input type="hidden" name='p_id' value=${selected_p_id}>--%>
+            <%--<input type="file" name="file">--%>
+            <%--<input type="submit" value="导入excel" >--%>
+        <%--</form>--%>
 
+<%--</div>--%>
+
+<div class="col-md-3"></div>
 
 
     <!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->

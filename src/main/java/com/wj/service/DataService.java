@@ -29,6 +29,9 @@ public class DataService {
     private DGroupDao dGroupDao;
     @Autowired
     private CheckItemDao checkItemDao;
+    @Autowired
+    private IndicatorsDao indicatorsDao;
+
 
 
     /*
@@ -36,7 +39,7 @@ public class DataService {
     *
     * */
     @Transactional
-    public int uploadExcelSuccess(CheckItem checkItem,MultipartFile file, User user) throws IOException, ParseException {
+    public int uploadExcelSuccess(int c_id,MultipartFile file, User user) throws IOException, ParseException {
         if(file.isEmpty()){
             return 0;
         }
@@ -64,7 +67,7 @@ public class DataService {
 
             for(List<SampleData> sd : sampleDatas) {
                 D_Group d_group = new D_Group();
-                d_group.setC_id(checkItem.getC_id());
+                d_group.setC_id(c_id);
                 d_group.setCreate_time(entyrTime.toString());
                 d_group.setObtain_time(sd.get(0).getObtain_time());
                 dGroupDao.InsertInto_DGroupInfo(d_group);
@@ -166,26 +169,34 @@ public class DataService {
     }
 
     /*
+    * 点击*/
+
+    /*
     * 拉取用户下所有项目信息列表
     * */
     public List<CheckItem> get_All_CheckItemInfoList(int p_id){
         List<CheckItem> checkItems = new ArrayList<CheckItem>(checkItemDao.Query_AllCheckItems_Info(p_id));
-
         return checkItems;
     }
 
     /*删除某用户某项目，实际为该状态
     */
 
-    public void deleteCheckItem(int c_id){
+    public void deleteCheckItem(int c_id,int p_id){
         System.out.println("删除的项目id》》》"+c_id);
 
-        projectDao.Update_Project_Status(c_id,0);
-        projectDao.Update_NewestProjectsTo1();
+        checkItemDao.Update_CheckItem_Status(c_id,0);
+        checkItemDao.Update_NestCheckitem2_to1(p_id);
+    }
+
+
+    /*获取最新checkItem*/
+    public CheckItem getNestCheckItem(int p_id){
+        return checkItemDao.get_nest_CheckItem(p_id);
     }
 
 //----------data---------------
-    /*获取该checkeditem 所有数据并转成json*/
+    /*获取该checkeditem 中所有值，并以组分好*/
     public List<List<SampleData>> getAllDataInCheckItem(int c_id){
         System.out.println(c_id);
         List<List<SampleData>> list_2=null;
@@ -221,15 +232,163 @@ public class DataService {
         checkItem=checkItemDao.get_CheckItem(c_id);
         return checkItem;
     }
+    @Transactional
+    public void clickAtCheckItem(int c_id){
+        checkItemDao.Update_AllCheckItem_1_to_2();//先把所有是1的重制为2
+        checkItemDao.Update_CheckItem_Status(c_id,1);//再把需要的设置为1
+    }
+    @Transactional
+    public void clickAtProject(int p_id){
+        projectDao.Update_AllProjects_1_to_2();//先重制项目状态
+        projectDao.Update_Project_Status(p_id,1);//将点击项目状态更新为1
+        checkItemDao.Update_AllCheckItem_1_to_2();//又把所有是1的子项目重制为2
+        checkItemDao.Update_NestCheckitem2_to1(p_id);//将子项目中最新的一条更新为1
+    }
 
-//    public static void main(String[] args) {
-//        List<List<SampleData>> sampleData = getAllDataInCheckItem(5);
-//        for(List<SampleData> sd : sampleData){
-//            System.out.println("-->"+sd.getValue());
-//
+    /*更新或添加Indicators信息*/
+    public void uploadOrAddIndicatorsInfo(int c_id,Indicators indicators){
+        List<Indicators>IList=new ArrayList<Indicators>();
+        IList=indicatorsDao.getIndicatorInfo(c_id);
+        if(IList.size()==0){
+            indicatorsDao.insertIndicatorInfo(indicators);
+        }
+        else {
+            indicatorsDao.updateIndicatorInfo(indicators);
+        }
+    }
+    /*获取Indicators信息*/
+    public Indicators getIndicators(int c_id){
+//        List<Indicators>IList=new ArrayList<Indicators>();
+//        IList=indicatorsDao.getIndicatorInfo(c_id);
+//        if(IList.size()==0)
+//            return null;
+//        else
+//            return  IList.get(0);
+        Indicators indicators=new Indicators();
+        Indicators tempDicators=new Indicators();
+        if(indicatorsDao.getIndicatorInfo(c_id).size()==0){
+            tempDicators.setUSL(0);
+            tempDicators.setLSL(0);
+            tempDicators.setTargetValue(0);
+            return  tempDicators;
+
+        }
+
+        else {
+            indicators=indicatorsDao.getIndicatorInfo(c_id).get(0);
+            return  indicators;
+        }
+    }
+
+    /*获取某检查项目下所有数据，返回为list*/
+    public List<SampleData> getALLSampleDataByCID(int c_id){
+
+        if(sampleDataDao.get_SampleDataListInDB(c_id).size()==0)
+            return null;
+        else
+            return sampleDataDao.get_SampleDataListInDB(c_id);
+    }
+
+    /*获取某检查项目下所有组数据平均值，返回为list*/
+    public List<Double> getAVGofValueInGID(int c_id){
+        if(sampleDataDao.get_AVGofValueByG_id(c_id).size()==0)
+            return null;
+        else
+            return sampleDataDao.get_AVGofValueByG_id(c_id);
+    }
+
+    /*获取某检查项目下所有组数据抽检时间，返回为list*/
+    public List<String> getObtainTimeInGID(int c_id){
+        if(sampleDataDao.get_ObtainTimeofValueByG_id(c_id).size()==0)
+            return null;
+        else
+            return sampleDataDao.get_ObtainTimeofValueByG_id(c_id);
+    }
+
+    /*获取样本运行图的x坐标*/
+    public List<Integer> getXOfSampleDataRunTable(List<SampleData> sampleData){
+        List<Integer> Xlist=new ArrayList<Integer>();
+        if (sampleData.size()==0)
+            return null;
+        else
+        {
+            int j=1;
+            Xlist.add(j);
+            for(int i=0;i<sampleData.size()-1;++i){
+                if(sampleData.get(i+1).getG_id()!=sampleData.get(i).getG_id())
+                    ++j;
+                Xlist.add(j);
+            }
+        }
+        return Xlist;
+    }
+
+    /*获取样本运行图的y坐标*/
+    public List<Double> getYOfSampleDataRunTable(List<SampleData> sampleData){
+        List<Double> SVlaueList = new ArrayList<Double>();
+        for (SampleData sd :sampleData){
+            SVlaueList.add(sd.getValue());
+        }
+        return SVlaueList;
+    }
+
+    //获取数组中最大值
+    public double getMaxInList(List<Double> list){
+        double max;
+        max=list.get(0);
+        for(Double l :list){
+            if(l.doubleValue()>max)
+                max=l.doubleValue();
+        }
+        System.out.println("该数列最大值：------>"+max);
+        return max;
+    }
+
+    //获取CPk列表
+    public List<Double> getCPkList(List<List<SampleData>> lists,Double USL,Double LSL){
+        SampleDataHandler sampleDataHandler = new SampleDataHandler();
+        List<Double> CPkList =new ArrayList<Double>();
+
+        for(List<SampleData> sd : lists){
+            List<Double> tempList =new ArrayList<Double>();
+            for(SampleData s:sd){
+                tempList.add(s.getValue());
+                System.out.println("将数据导入temp--->"+s.getValue());
+            }
+            System.out.println("temp--->"+tempList.size()+"---"+USL+"---"+LSL);
+            CPkList.add(sampleDataHandler.get_CPK(tempList,USL,LSL));
+        }
+//        for(Double i : CPkList){
+//            System.out.println("CPK-->"+i);
 //        }
-//
-//    }
+        return CPkList;
+    }
+    /*将所有数据状态进行更新
+    * 1：已经输入，已处理，合格 2：已经输入，未处理 0：已经输入 ，已经处理，不合格 4：已经输入，已删除*/
+    public void updateSampleStatus(List<List<SampleData>> lists,double USL,double LSL){
+        for(List<SampleData> sampleDataList :lists){
+            for (SampleData sd:sampleDataList){
+                double value=sd.getValue();
+                if(value>=LSL&&value<=USL){
+                    sampleDataDao.upataeSD_Status(sd.getId(),1);
+                }
+                else {
+                    sampleDataDao.upataeSD_Status(sd.getId(),0);
+                }
+            }
+        }
+    }
+
+    /*计算兵备道合格率列表*/
+    public List<Double> getPassRateList(List<List<SampleData>>lists,double USL ,double LSL){
+        SampleDataHandler sampleDataHandler =new SampleDataHandler();
+        List<Double> psaaRateList=new ArrayList<Double>();
+        for(List<SampleData> sd:lists){
+            psaaRateList.add(sampleDataHandler.get_PassRate(sd,USL,LSL));
+        }
+        return psaaRateList;
+
+    }
 
 
 }

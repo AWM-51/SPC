@@ -46,5 +46,10 @@ public class UserService {
          loginLogDao.insertLoginLog(loginLog);
      }
 
+     /*通过id获取用户*/
+     public User getUserById(int u_id){
+         return userDao.getUserById(u_id);
+     }
+
 
 }

@@ -3,6 +3,7 @@ package com.wj.util;
 import com.wj.domain.SampleData;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,6 +115,57 @@ public class SampleDataHandler {
     public Double get_Cp(Double variance , Double USL ,Double LSL){
         return 1.00000*(USL-LSL)/(6*variance);
     }
+
+    /*
+    * 计算CPK
+    * 公式 CPK=Cp*（1-|Ca|）
+    * */
+    public Double get_CPK(List<Double> dataList, Double USL ,Double LSL){
+        Double Ca=get_Ca(get_average(dataList),USL,LSL);
+        Double Cp=get_Cp(get_variance(dataList),USL,LSL);
+        Double Cpk=Cp*(1-Math.abs(Ca));
+        System.out.println("variance="+get_variance(dataList)+"  Ca="+Ca+"   Cp="+Cp+"   CPK="+Cpk);
+        return get_stanardData(Cpk);
+    }
+
+    public Double get_PassRate(List<SampleData> list,Double USL,Double LSL){
+        for(SampleData sampleData : list){
+            System.out.println("数据："+sampleData.getValue());
+        }
+        System.out.println("USL:"+USL+"   LSL:"+LSL);
+        DecimalFormat df=new DecimalFormat("0.0000");
+
+        int size = list.size();
+        int pass=0;
+        for(SampleData d : list){
+            double value=d.getValue();
+            if(value>LSL&&value<USL){
+                ++pass;
+            }
+        }
+        System.out.println("pass个数："+pass);
+        System.out.println("总个数："+size);
+        System.out.println("合格率:"+df.format((double) pass/size));
+        return get_stanardData(Double.valueOf(df.format((double) pass/size)));
+    }
+
+//    public static void main(String[] args) {
+//        SampleDataHandler sampleDataHandler=new SampleDataHandler();
+//        List<Double> list=new ArrayList<Double>();
+//        list.add(9.2999);
+//        list.add(8.9821);
+//        list.add(9.0121);
+//        list.add(9.1122);
+//        list.add(8.8999);
+//
+////        list.add(9.2009);
+////        list.add(8.0021);
+////        list.add(9.0991);
+////        list.add(9.1002);
+////        list.add(8.7299);
+//        Double s=sampleDataHandler.get_variance(list);
+//        System.out.println("avg"+sampleDataHandler.get_average(list)+"v"+sampleDataHandler.get_stanardData(s));
+//    }
 
 
 

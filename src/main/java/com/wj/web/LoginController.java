@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +47,17 @@ public class LoginController {
         List<Project> projects = new ArrayList<Project>();
         projects=dataService.get_All_ProjectInfoList(user.getUserId());
 
+        request.getSession().setAttribute("user",user);
+        if (!projects.isEmpty())
+            request.getSession().setAttribute("projects",projects);
+        return new ModelAndView("main");
+    }
+
+    @RequestMapping(value = "/gotoMain.html")
+    public ModelAndView gotoMain(HttpServletRequest request,int u_id) {
+        List<Project> projects = new ArrayList<Project>();
+        projects=dataService.get_All_ProjectInfoList(u_id);
+        User user = userService.getUserById(u_id);
         request.getSession().setAttribute("user",user);
         if (!projects.isEmpty())
             request.getSession().setAttribute("projects",projects);

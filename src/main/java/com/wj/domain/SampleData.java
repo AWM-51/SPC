@@ -7,7 +7,7 @@ public class SampleData {
     private int g_id;
     private String obtain_time;
     private Double value;
-    private int s_status;
+    private int s_status;//1：已经输入，已处理，合格 2：已经输入，未处理 0：已经输入 ，已经处理，不合格 4：已经输入，已删除
     public int getId() {
         return id;
     }

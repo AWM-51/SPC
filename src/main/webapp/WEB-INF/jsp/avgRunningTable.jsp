@@ -21,7 +21,7 @@
 <ol class="breadcrumb">
     <li><a href="/gotoMain.html?u_id=${user.userId}">Home</a></li>
     <li><a href="/showCheckItem.html?p_id=${selected_p_id}">CheckItem</a></li>
-    <li class="active">样本运行图</li>
+    <li class="active">均值运行图</li>
 </ol>
 <!-- Single button -->
 <div class="jumbotron">
@@ -29,7 +29,7 @@
 </div>
 <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
 <div id="main" style="width: 1000px;height:400px;"></div>
-<h1>整体cpk:${cpk}</h1>
+
 <script type="text/javascript">
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('main'));
@@ -37,11 +37,11 @@
     // 指定图表的配置项和数据
     var option = {
         title: {
-            text: '样本运行图'
+            text: '均值运行图'
         },
         tooltip: {},
         legend: {
-            data:[' 样本数据']
+            data:[' 组内平均值数据']
         },
         xAxis: {
             data: ${xList}
@@ -52,26 +52,13 @@
             scale:true
         },
         series: [{
-            name: '样本数据',
+            name: '组内平均值数据',
             type: 'line',
             color:"black",
-            data: ${SVlaueList},
-            markPoint : {
-                data : [
-                    // 纵轴，默认
-                    {type : 'max', name: '最大值',symbol: 'emptyCircle', itemStyle:{normal:{color:'#dc143c',label:{position:'top'}}}},
-                    {type : 'min', name: '最小值',symbol: 'emptyCircle', itemStyle:{normal:{color:'#dc143c',label:{position:'bottom'}}}},
-                    // 横轴
-                    {type : 'max', name: '最大值', valueIndex: 0, symbol: 'emptyCircle', itemStyle:{normal:{color:'#1e90ff',label:{position:'right'}}}},
-                    {type : 'min', name: '最小值', valueIndex: 0, symbol: 'emptyCircle', itemStyle:{normal:{color:'#1e90ff',label:{position:'left'}}}}
-                ]
-            },
+            data: ${AVGValueList},
             markLine : {
                 data : [
                     // 纵轴，默认
-                    {type : 'max', name: '最大值', itemStyle:{normal:{color:'#dc143c'}}},
-                    {type : 'min', name: '最小值', itemStyle:{normal:{color:'#dc143c'}}},
-                    {type : 'average', name : '平均值', itemStyle:{normal:{color:'#dc143c'}}},
                     {
                         name: 'USL',
                         yAxis: ${USL},
@@ -133,10 +120,7 @@
                             }
                         }
                     }
-//                    // 横轴
-//                    {type : 'max', name: '最大值', valueIndex: 0, itemStyle:{normal:{color:'#1e90ff'}}},
-//                    {type : 'min', name: '最小值', valueIndex: 0, itemStyle:{normal:{color:'#1e90ff'}}},
-//                    {type : 'average', name : '平均值', valueIndex: 0, itemStyle:{normal:{color:'#1e90ff'}}}
+
                 ]
             }
         }

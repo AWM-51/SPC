@@ -2,8 +2,10 @@ package com.wj.domain;
 
 public class AttributesValue {
     private int id;
-    private int type_id;//什么类型的状态值 1：project  2：checkitem 3：group  4：sampledata
-    private int f_id;//与tepe_id对应选取值
+    private int c_id;
+    private int g_id;
+    private int p_id;
+    private int s_id;
     private Double averageValue;
     private Double variance;
     private Double standardDeviation;
@@ -22,20 +24,37 @@ public class AttributesValue {
         this.id = id;
     }
 
-    public int getType_id() {
-        return type_id;
+
+    public int getC_id() {
+        return c_id;
     }
 
-    public void setType_id(int type_id) {
-        this.type_id = type_id;
+    public void setC_id(int c_id) {
+        this.c_id = c_id;
     }
 
-    public int getF_id() {
-        return f_id;
+    public int getG_id() {
+        return g_id;
     }
 
-    public void setF_id(int f_id) {
-        this.f_id = f_id;
+    public void setG_id(int g_id) {
+        this.g_id = g_id;
+    }
+
+    public int getP_id() {
+        return p_id;
+    }
+
+    public void setP_id(int p_id) {
+        this.p_id = p_id;
+    }
+
+    public int getS_id() {
+        return s_id;
+    }
+
+    public void setS_id(int s_id) {
+        this.s_id = s_id;
     }
 
     public Double getAverageValue() {
