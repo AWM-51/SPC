@@ -1,9 +1,6 @@
 package com.wj.dao;
 
-import com.wj.domain.CheckItem;
-import com.wj.domain.D_Group;
-import com.wj.domain.Project;
-import com.wj.domain.SampleData;
+import com.wj.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,8 +23,9 @@ public class CheckItemDao {
             " = (SELECT c_id FROM (SELECT c_id FROM checked_item WHERE (c_status=1 OR c_status=2)AND p_id = ? ORDER BY c_id DESC " +
             "LIMIT 1) a )";
     private final static String GET_CHECKITEM_SQL="SELECT * FROM checked_item WHERE c_id=?";
+    private final static String GET_CHECKITEM_BY_PID_SQL="SELECT * FROM checked_item WHERE p_id = ?";
 
-    private final static String GET_ALL_DATA_SQL="SELECT * From d_group_info LEFT JOIN sampleData ON d_group_info.g_id = sampleData.g_id WHERE d_group_info.c_id = ?";
+    private final static String GET_ALL_DATA_SQL="SELECT * From d_group_info LEFT JOIN sampleData ON d_group_info.g_id = sampleData.g_id WHERE d_group_info.c_id = ? AND sampleData.s_status!=4";
 
     @Autowired
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
@@ -118,6 +116,12 @@ public class CheckItemDao {
     public void Update_NestCheckitem2_to1(int p_id){
         Object[] args = {p_id};
         jdbcTemplate.update(UPDATE_NEST_CHECKITEM_TO_1_SQL,args);
+    }
+
+    /*根据p_id获取c_id列表*/
+    public List<CheckItem> getCheckItemListByPID(int p_id){
+        Object[] args = {p_id};
+        return jdbcTemplate.query(GET_CHECKITEM_BY_PID_SQL,args,new BeanPropertyRowMapper<CheckItem>(CheckItem.class));
     }
 
 }

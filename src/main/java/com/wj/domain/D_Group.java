@@ -3,7 +3,7 @@ package com.wj.domain;
 public class D_Group {
     private int g_id;
     private int c_id;
-    private int g_status;//1: 正常 2：异常
+    private int g_status;//1: 正常 2：异常 -1 :删除
     private String obtain_time;
     private String create_time;
 

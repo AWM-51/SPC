@@ -47,8 +47,8 @@
             data: ${xList}
         },
         yAxis: {
-            min:0,
-            max:${max},
+            min:${min-0.5},
+            max:${1.5*max+2},
             scale:true
         },
         series: [{

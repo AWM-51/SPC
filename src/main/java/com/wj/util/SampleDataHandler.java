@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SampleDataHandler {
+    //统计学数组
+
+    public static final Double[] D2={1.0,1.0,1.128,1.169,2.059,2.326,2.543,2.704,2.847,2.970,3.078,3.173,3.258,3.336,3.407
+            ,3.472,3.532,3.588,3.640,3.689,3.735,3.778,3.819,3.858,3.895,3.931};
     /*
    * 数据筛选
    * 如果某项数据数据为null则跳过
@@ -52,7 +56,7 @@ public class SampleDataHandler {
             sum += d;
         }
         int Denominator=dataList.size();
-        return sum/Denominator;
+        return get_stanardData(sum/Denominator);
     }
 
     /*
@@ -80,7 +84,7 @@ public class SampleDataHandler {
         Double variance = get_variance(dataList);
         Double result;
         result = Math.sqrt(Math.abs(variance));
-        return result;
+        return get_stanardData(result);
     }
 
     /*格式化数据
@@ -103,7 +107,7 @@ public class SampleDataHandler {
         Double U=1.00000*(USL+LSL)/2;
         Double T=1.00000*(USL-LSL);
         Double Ca=(X-U)/(T/2);
-        return Ca;
+        return get_stanardData(Ca);
     }
 
 
@@ -112,21 +116,134 @@ public class SampleDataHandler {
     * 计算Cp值（制程精密度）
     * 依据公式 Cp =T/6σ
     * */
-    public Double get_Cp(Double variance , Double USL ,Double LSL){
-        return 1.00000*(USL-LSL)/(6*variance);
+    public Double get_Cp(Double standardDeviation , Double USL ,Double LSL){
+        return 1.00000*(USL-LSL)/(6*standardDeviation);
     }
 
     /*
-    * 计算CPK
+    * 计算过程中每个数据的CPK
     * 公式 CPK=Cp*（1-|Ca|）
     * */
-    public Double get_CPK(List<Double> dataList, Double USL ,Double LSL){
+    public Double get_CP(List<Double> dataList, Double USL ,Double LSL,Double SD){
         Double Ca=get_Ca(get_average(dataList),USL,LSL);
-        Double Cp=get_Cp(get_variance(dataList),USL,LSL);
+        Double Cp=get_Cp((SD/2.326),USL,LSL);//(SD/2.326)通过极差估计标准差
+        System.out.println("--- 标准差----"+get_standard_Deviation(dataList));
         Double Cpk=Cp*(1-Math.abs(Ca));
-        System.out.println("variance="+get_variance(dataList)+"  Ca="+Ca+"   Cp="+Cp+"   CPK="+Cpk);
+        System.out.println("估计值标准差="+(SD/2.326)+"  Ca="+Ca+"   Cp="+Cp+"   CPK="+Cpk);
         return get_stanardData(Cpk);
     }
+    public  Double get_CPK(List<Double> dataList, Double USL ,Double LSL,Double SD){
+        Double Cpl=get_Cpl(dataList,LSL,SD);
+        Double Cpu=get_Cpu(dataList,USL,SD);
+
+        return Cpl<Cpu?Cpl:Cpu;
+    }
+    /*Cpu*/
+    public Double get_Cpu(List<Double> dataList, Double USL,Double SD){
+        return get_stanardData((USL-get_average(dataList))/(3.0000*(SD/2.326)));
+    }
+
+    /*Cpl*/
+    public Double get_Cpl(List<Double> dataList, Double LSL,Double SD){
+        return get_stanardData((get_average(dataList)-LSL)/(3.0000*(SD/2.326)));
+    }
+
+
+    /*计算最大值*/
+    public double getMaxInList(List<Double> l){
+        double max;
+
+        max=l.get(0);
+        for(Double a :l){
+            if(a.doubleValue()>max)
+                max=a.doubleValue();
+        }
+        return max;
+    }
+    /*计算最小值*/
+    public double getMinInList(List<Double> l){
+        double min;
+
+        min=l.get(0);
+        for(Double a :l){
+            if(a.doubleValue()<min)
+                min=a.doubleValue();
+        }
+        return min;
+    }
+    //获取样本数据SampleData数组中最大值
+    public double getMaxInListForSampleData(List<SampleData> list){
+        double max1;
+        max1=list.get(0).getValue();
+        for(SampleData l :list){
+            if(l.getValue()>max1)
+                max1=l.getValue();
+        }
+        return max1;
+    }
+    //获取样本数据SampleData数组中最大值
+    public double getMinInListForSampleData(List<SampleData> list){
+        double min;
+        min=list.get(0).getValue();
+        for(SampleData l :list){
+            if(l.getValue()<min)
+                min=l.getValue();
+        }
+        return min;
+    }
+    /*计算极差*/
+    public Double get_R(List<Double> list){
+        return get_stanardData(getMaxInList(list)-getMinInList(list));
+    }
+    /*计算极差 参数为样本数据对象*/
+    public Double get_R_S(List<SampleData> list){
+        return get_stanardData(getMaxInListForSampleData(list)-getMinInListForSampleData(list));
+    }
+
+    /* 通过RBar/d2 来估计极差*/
+    public double get_SDByRBar_d2(List<Double> R_List){
+        int num=5;
+        Double avg=get_average(R_List);
+        return get_stanardData(avg/D2[num]);
+    }
+
+    /*计算组内CPK 需要等到样本数据稳定后，其区别在于西格玛采用估计值，即S=Rbar/d2，在过程稳定的情况下，与统计学公式计算出来的标准差误差不大*/
+    public Double get_R_CPK(){return 1.0;}
+    /*
+    * 计算PPU
+    * Cpu=(USL-Average)/3σ
+    * 标准差采用整体标准差
+    * */
+    public Double get_Ppu(List<Double> dataList, Double USL){
+        return get_stanardData((USL-get_average(dataList))/(3.0000*get_standard_Deviation(dataList)));
+    }
+
+
+    /*计算PPL
+    * Cpl=(Average-LSL)/3σ */
+    public Double get_Ppl(List<Double> dataList, Double LSL){
+        return get_stanardData((get_average(dataList)-LSL)/(3.0000*get_standard_Deviation(dataList)));
+    }
+    /*计算的Ppk
+    * Ppk=min{ppu,pul}*/
+    public Double get_PPK(List<Double> dataList, Double USL ,Double LSL){
+        Double cpu=get_Ppu(dataList,USL);
+        Double cpl=get_Ppl(dataList,LSL);
+
+        return cpu>cpl?cpl:cpu;
+    }
+
+    public Double get_PP(List<Double> dataList, Double USL ,Double LSL){
+        Double Pa=get_Ca(get_average(dataList),USL,LSL);
+        Double Pp=get_Cp(get_standard_Deviation(dataList),USL,LSL);
+        Double PP=Pp*(1-Math.abs(Pa));
+        return get_stanardData(PP);
+    }
+
+
+    /*计算Ppl
+    * 与Cpk差别在于标准差采用整体标准差
+    * */
 
     public Double get_PassRate(List<SampleData> list,Double USL,Double LSL){
         for(SampleData sampleData : list){
@@ -139,7 +256,7 @@ public class SampleDataHandler {
         int pass=0;
         for(SampleData d : list){
             double value=d.getValue();
-            if(value>LSL&&value<USL){
+            if(value>=LSL&&value<=USL){
                 ++pass;
             }
         }
@@ -166,6 +283,35 @@ public class SampleDataHandler {
 //        Double s=sampleDataHandler.get_variance(list);
 //        System.out.println("avg"+sampleDataHandler.get_average(list)+"v"+sampleDataHandler.get_stanardData(s));
 //    }
+
+    /*冒泡排序*/
+    public List<Double> bubbleSort(List<Double> list){
+        int n=list.size();
+        int j , k;
+        int flag = n ;//flag来记录最后交换的位置，也就是排序的尾边界
+
+        while (flag > 0){//排序未结束标志
+            k = flag; //k 来记录遍历的尾边界
+            flag = 0;
+
+            for(j=1; j<k; j++){
+                if(list.get(j-1) > list.get(j)){//前面的数字大于后面的数字就交换
+                    //交换a[j-1]和a[j]
+                    double temp;
+                    temp = list.get(j-1);
+                    list.set(j - 1, list.get(j));
+                    list.set(j, temp);
+
+                    //表示交换过数据;
+                    flag = j;//记录最新的尾边界.
+                }
+            }
+        }
+        return list;
+    }
+
+
+
 
 
 

@@ -117,8 +117,10 @@ public class SampleDataDao {
 
     /*更新样本数据的状态*/
     public void upataeSD_Status(int id,int status){
-        Object[] args={id,status};
-        jdbcTemplate.update(UPDATE_SAMPLEDATA_STATUS_SQL,args);
+        Object[] args={status,id};
+
+        //jdbcTemplate.update(UPDATE_SAMPLEDATA_STATUS_SQL,args);
+        System.out.println("id:"+id+" status:"+status+"   "+jdbcTemplate.update(UPDATE_SAMPLEDATA_STATUS_SQL,args));
     }
 
 
