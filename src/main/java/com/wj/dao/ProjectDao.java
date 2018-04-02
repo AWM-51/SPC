@@ -27,6 +27,7 @@ public class ProjectDao {
     private final static String UPDATE_NEST_PROJECT_TO_1_SQL="UPDATE project_info SET p_status=1 WHERE p_id " +
             " = (SELECT p_id FROM (SELECT p_id FROM project_info WHERE p_status=1 OR p_status=2 ORDER BY p_id DESC " +
             "LIMIT 1) a )";
+    private final static String GET_PROJECT_BY_PID="SELECT * FROM project_info WHERE p_id=?";
 
 
 
@@ -46,6 +47,12 @@ public class ProjectDao {
         catch (Exception e){
             System.out.println(project.getU_id()+"!!!!"+project.getP_name()+"#########"+e);
         }
+    }
+
+    /*根据p_id获取项目信息*/
+    public Project get_projectByP_id(int p_id){
+        Object[] args={p_id};
+        return jdbcTemplate.query(GET_PROJECT_BY_PID,args,new BeanPropertyRowMapper<Project>(Project.class)).get(0);
     }
 
     /*更新project整体信息*/

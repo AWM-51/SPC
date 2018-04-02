@@ -23,7 +23,7 @@ public class SampleDataDao {
     private static String UPDATE_SAMPLEDATA_STATUS_SQL="UPDATE sampleData SET s_status = ? WHERE id =?";
     private static String SELECT_SAMPLEDATA_BT_C_ID_SQL="SELECT * FROM sampleData LEFT JOIN d_group_info ON d_group_info.g_id = sampleData.g_id WHERE d_group_info.c_id = ? ";
     private static String GET_AVG_BY_GID="SELECT AVG(value),d_group_info.obtain_time FROM sampleData LEFT JOIN d_group_info ON d_group_info.g_id = sampleData.g_id WHERE d_group_info.c_id = ? GROUP BY d_group_info.g_id";
-
+    private static String UPDATE_SAMPLEDATAVALUE_SQL="UPDATE sampleData SET value = ? WHERE id=?";
 
     @Autowired
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate){this.jdbcTemplate=jdbcTemplate;}
@@ -121,6 +121,12 @@ public class SampleDataDao {
 
         //jdbcTemplate.update(UPDATE_SAMPLEDATA_STATUS_SQL,args);
         System.out.println("id:"+id+" status:"+status+"   "+jdbcTemplate.update(UPDATE_SAMPLEDATA_STATUS_SQL,args));
+    }
+
+    /*更新样本数据值*/
+    public void updateSD_Value(int id,Double value){
+        Object[] args={value,id};
+        System.out.println("id:"+id+" 值更新为 value:"+value+"   "+jdbcTemplate.update(UPDATE_SAMPLEDATAVALUE_SQL,args));
     }
 
 

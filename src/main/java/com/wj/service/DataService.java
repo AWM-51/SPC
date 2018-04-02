@@ -189,7 +189,7 @@ public class DataService {
     public void deleteCheckItem(int c_id,int p_id){
         System.out.println("删除的项目id》》》"+c_id);
 
-        checkItemDao.Update_CheckItem_Status(c_id,0);
+        checkItemDao.Update_CheckItem_Status(c_id,0);//状态为0即为删除
         checkItemDao.Update_NestCheckitem2_to1(p_id);
     }
 
@@ -204,7 +204,7 @@ public class DataService {
     public List<List<SampleData>> getAllDataInCheckItem(int c_id){
         System.out.println(c_id);
         List<List<SampleData>> list_2=null;
-        List<SampleData> sampleDataList = checkItemDao.Get_AllDataInCheckItem(c_id);
+        List<SampleData> sampleDataList = checkItemDao.get_AllDataInCheckItem(c_id);
         List<D_Group> g_idList=checkItemDao.get_Group_In_CheckItem(c_id);
         list_2=new ArrayList<List<SampleData>>();
         if(sampleDataList.isEmpty()||g_idList.isEmpty() )
@@ -307,7 +307,7 @@ public class DataService {
     /*获取样本运行图的x坐标*/
     public List<Integer> getXOfSampleDataRunTable(List<SampleData> sampleData){
         List<Integer> Xlist=new ArrayList<Integer>();
-        if (sampleData.size()==0)
+        if (sampleData==null)
             return null;
         else
         {
@@ -323,43 +323,65 @@ public class DataService {
     }
     /*获取样本运行图中极差控制图中X轴坐标*/
     public List<Integer> get_XRlist(List<List<SampleData>> lists){
-        List<Integer> xRlist=new ArrayList<Integer>();
-        for(int i=0;i<lists.size();++i){
-            xRlist.add(i+1);
+        if(lists==null)
+            return null;
+        else {
+            List<Integer> xRlist=new ArrayList<Integer>();
+            for(int i=0;i<lists.size();++i){
+                xRlist.add(i+1);
+            }
+            return xRlist;
         }
-        return xRlist;
+
     }
 
     /*获取样本运行图的y坐标*/
     public List<Double> getYOfSampleDataRunTable(List<SampleData> sampleData){
         List<Double> SVlaueList = new ArrayList<Double>();
-        for (SampleData sd :sampleData){
-            SVlaueList.add(sd.getValue());
+        if(sampleData==null)
+            return null;
+        else{
+            for (SampleData sd :sampleData){
+                SVlaueList.add(sd.getValue());
+            }
+            return SVlaueList;
         }
-        return SVlaueList;
+
+
     }
 
     //获取数组中最大值
     public double getMaxInList(List<Double> list){
         double max;
-        max=list.get(0);
-        for(Double l :list){
-            if(l.doubleValue()>max)
-                max=l.doubleValue();
+        if(list==null)
+            max= 0;
+
+        else{
+            max=list.get(0);
+            for(Double l :list){
+                if(l.doubleValue()>max)
+                    max=l.doubleValue();
+            }
+            System.out.println("该数列最大值：------>"+max);
         }
-        System.out.println("该数列最大值：------>"+max);
+
         return max;
     }
 
     //获取数组中最 小值
     public double getMinInList(List<Double> list){
         double min;
-        min=list.get(0);
-        for(Double l :list){
-            if(l.doubleValue()<min)
-                min=l.doubleValue();
+        if (list==null)
+            min=0;
+        else {
+            min=list.get(0);
+            for(Double l :list){
+                if(l.doubleValue()<min)
+                    min=l.doubleValue();
+            }
+            System.out.println("该数列最小值：------>"+min);
         }
-        System.out.println("该数列最小值：------>"+min);
+
         return min;
     }
 
@@ -387,7 +409,8 @@ public class DataService {
         return min;
     }
 
-    //将列表改变一下
+    //将列表改变一下,
+    //将 【1，2】，【3，4】，【5，6】  改成【1，2】，【1，2，3，4】，【1，2，3，4，5，6】
 
     public List<List<SampleData>> changList(List<List<SampleData>> lists) {
         List<SampleData> a=new ArrayList<SampleData>();
@@ -442,17 +465,26 @@ public class DataService {
     public List<Double> getCPULK(List<List<SampleData>> lists,Double USL,Double LSL) {
         SampleDataHandler sampleDataHandler = new SampleDataHandler();
         List<Double> CPULK =new ArrayList<Double>();
-        int index=lists.size()-1;
+        List<Double> E_CPULK=new ArrayList<Double>();
+        E_CPULK.add(-99999.0);
+        E_CPULK.add(-99999.0);
+        E_CPULK.add(-99999.0);
+        if (lists==null)
+            return E_CPULK;
+        else {
+            int index=lists.size()-1;
             List<Double> tempList =new ArrayList<Double>();
             for(SampleData s:lists.get(index)){
                 tempList.add(s.getValue());
             }
             System.out.println("temp--->"+tempList.size()+"---"+USL+"---"+LSL);
 
-        CPULK.add(sampleDataHandler.get_Cpl(tempList,LSL,getRList(lists).get(index)));
-        CPULK.add(sampleDataHandler.get_Cpu(tempList,USL,getRList(lists).get(index)));
-        CPULK.add(sampleDataHandler.get_CPK(tempList,USL,LSL,getRList(lists).get(index)));
-        return CPULK;
+            CPULK.add(sampleDataHandler.get_Cpl(tempList,LSL,getRList(lists).get(index)));
+            CPULK.add(sampleDataHandler.get_Cpu(tempList,USL,getRList(lists).get(index)));
+            CPULK.add(sampleDataHandler.get_CPK(tempList,USL,LSL,getRList(lists).get(index)));
+            return CPULK;
+        }
+
     }
 
     /*
@@ -460,18 +492,25 @@ public class DataService {
     public List<Double>getRList(List<List<SampleData>> lists){
         SampleDataHandler sampleDataHandler=new SampleDataHandler();
         List<Double>Rlist=new ArrayList<Double>();
-        for(List<SampleData> sampleDataList:lists){
-            Rlist.add(sampleDataHandler.get_R_S(sampleDataList));
+        if(lists==null)
+            return null;
+        else {
+            for(List<SampleData> sampleDataList:lists){
+                Rlist.add(sampleDataHandler.get_R_S(sampleDataList));
+            }
+            return Rlist;
         }
-        return Rlist;
+
     }
 
 
     /*获取极差平均值估计标准差*/
     public Double getSDBy_RBar_D2(List<Double> Rlist){
         SampleDataHandler sampleDataHandler=new SampleDataHandler();
-
-        return sampleDataHandler.get_SDByRBar_d2(Rlist);
+        if(Rlist==null)
+            return null;
+        else
+            return sampleDataHandler.get_SDByRBar_d2(Rlist);
     }
 
 
@@ -636,18 +675,6 @@ public class DataService {
         String[][] z = new String[result.size()][];
 
         for(int i=0;i<z.length;i++){
-
-//            Map m = (Map)result.get(i);
-//            Set set = m.keySet();
-//            z[i] = new String[m.size()];
-//            Iterator it =set.iterator();
-//
-//            for(int j=0;it.hasNext();j++){
-//                String s = (String)it.next();
-//                if(m.get(s)!=null){
-//                    z[i][j] =m.get(s).toString();
-//                }
-//            }
             int j=0;
             for(String s:result.get(i)){
                 z[i][j] =s;
@@ -682,13 +709,9 @@ public class DataService {
         SampleDataHandler sampleDataHandler=new SampleDataHandler();
         int l=c_idList.size();
         String[][] dataList=new String[l][16];
-
         int i=0;
-
-//        List<List<String>> lists=new ArrayList<List<String>>();
-
+        String p_name=projectDao.get_projectByP_id(p_id).getP_name();
         for(Integer c_id:c_idList){
-//            List<String> tempList=new ArrayList<String>();
             List<SampleData> SListBySample=getALLSampleDataByCID(c_id);
             List<List<SampleData>> dataInCheckItemByGroup = getAllDataInCheckItem(c_id);
             List<Double> SVlaueList=getYOfSampleDataRunTable(SListBySample);
@@ -697,53 +720,30 @@ public class DataService {
             double LSL=getIndicators(c_id).getLSL();
             double U=getIndicators(c_id).getTargetValue();
             String itemName=checkItemDao.get_CheckItem(c_id).getC_name();
-            int num=SListBySample.size();//样本数量
-            int g_num=dataInCheckItemByGroup.size();
-            double standardDeviation=getStandardDevicationInTotal(SVlaueList);//标准差  整体
-            double SD=getRList(dataInCheckItemByGroup).get(g_num-1);//标准差 组内
+            int num=dataInCheckItemByGroup==null?-9999:SListBySample.size();//样本数量
+            int g_num=dataInCheckItemByGroup==null?-9999:dataInCheckItemByGroup.size();
+            double standardDeviation=dataInCheckItemByGroup==null?-9999:getStandardDevicationInTotal(SVlaueList);//标准差  整体
+            double SD=dataInCheckItemByGroup==null?-9999:getRList(dataInCheckItemByGroup).get(g_num-1);//标准差 组内
 
-            double avg_total=getAVGIntotal(SListBySample);//整体平均值
-            double max_total=getMaxInListForSampleData(SListBySample);//整体最大值
-            double min_total=getMinInListForSampleData(SListBySample);//整体最小值
-            double R=max_total-min_total;//整体极差
-            double Cpl=getCPULK(dataInCheckItemByGroup,USL,LSL).get(0);//Cpl
-            double Cpu=getCPULK(dataInCheckItemByGroup,USL,LSL).get(1);//Cpu
-            double Cpk=getCPULK(dataInCheckItemByGroup,USL,LSL).get(2);//Cpk
-            double CP=sampleDataHandler.get_CP(SVlaueList,USL,LSL,SD);//CP
-            double Ppl=get_PPULK(SVlaueList,USL,LSL).get(0);//Ppl
-            double Ppu=get_PPULK(SVlaueList,USL,LSL).get(1);//Ppu
-            double Ppk=get_PPULK(SVlaueList,USL,LSL).get(2);//Ppk
-            double PP=sampleDataHandler.get_PP(SVlaueList,USL,LSL);//PP
+            double avg_total=dataInCheckItemByGroup==null?-9999:getAVGIntotal(SListBySample);//整体平均值
+            double max_total=dataInCheckItemByGroup==null?-9999:getMaxInListForSampleData(SListBySample);//整体最大值
+            double min_total=dataInCheckItemByGroup==null?-9999:getMinInListForSampleData(SListBySample);//整体最小值
+            double R=dataInCheckItemByGroup==null?-9999:(max_total-min_total);//整体极差
+            double Cpl=dataInCheckItemByGroup==null?-9999:getCPULK(dataInCheckItemByGroup,USL,LSL).get(0);//Cpl
+            double Cpu=dataInCheckItemByGroup==null?-9999:getCPULK(dataInCheckItemByGroup,USL,LSL).get(1);//Cpu
+            double Cpk=dataInCheckItemByGroup==null?-9999:getCPULK(dataInCheckItemByGroup,USL,LSL).get(2);//Cpk
+            double CP=dataInCheckItemByGroup==null?-9999:sampleDataHandler.get_CP(SVlaueList,USL,LSL,SD);//CP
+            double Ppl=dataInCheckItemByGroup==null?-9999:get_PPULK(SVlaueList,USL,LSL).get(0);//Ppl
+            double Ppu=dataInCheckItemByGroup==null?-9999:get_PPULK(SVlaueList,USL,LSL).get(1);//Ppu
+            double Ppk=dataInCheckItemByGroup==null?-9999:get_PPULK(SVlaueList,USL,LSL).get(2);//Ppk
+            double PP=dataInCheckItemByGroup==null?-9999:sampleDataHandler.get_PP(SVlaueList,USL,LSL);//PP
 
 
             // "检查项目", "Cpk", "Cp","Cpl","Cpu","Ppk","Pp","Ppl","Ppu","平均值"
                // ,"极差值","标准差（整体）","标准差（组内）","最大值","最小值","记录数"
-//
-//            tempList.add(itemName);
-//            tempList.add(String.valueOf(Cpk));
-//            tempList.add(String.valueOf(CP));
-//            tempList.add(String.valueOf(Cpl));
-//            tempList.add(String.valueOf(Cpu));
-//            tempList.add(String.valueOf(Ppk));
-//            tempList.add(String.valueOf(PP));
-//            tempList.add(String.valueOf(Ppl));
-//            tempList.add(String.valueOf(Ppu));
-//            tempList.add(String.valueOf(avg_total));
-//            tempList.add(String.valueOf(R));
-//            tempList.add(String.valueOf(standardDeviation));
-//            tempList.add(String.valueOf(SD));
-//            tempList.add(String.valueOf(max_total));
-//            tempList.add(String.valueOf(min_total));
-//            tempList.add(String.valueOf(num));
-//
-//            lists.add(tempList);
-//            dataList=LtoA(lists);
 
 
-
-
-
-            dataList[i][0]=itemName;
+            dataList[i][0]=p_name+"/"+itemName;
             dataList[i][1]=String.valueOf(Cpk);
             dataList[i][2]=String.valueOf(CP);
             dataList[i][3]=String.valueOf(Cpl);
@@ -775,16 +775,72 @@ public class DataService {
 
 
     /*导出良品率*/
-    public void exporeGoodProductRate(){
+    public void exporeGoodProductRate(int p_id){
         ExportEcxcel exportEcxcel=new ExportEcxcel();
         String sheetName = "良品率报表";
-        String titleName = "报表";
-        String fileName = "工序能力报表";
-        int columnNumber = 16;
-        int[] columnWidth = { 30, 10, 10,10,10,10,10,10,15,15,15,15,15,15,15,15 };
-        String[] columnName = { "检查项目", "Cpk", "Cp","Cpl","Cpu","Ppk","Pp","Ppl","Ppu","平均值"
-                ,"极差值","标准差（整体）","标准差（组内）","最大值","最小值","记录数" };
+        String titleName = "良品率报表";
+        String fileName = "良品率报表";
+        int columnNumber = 4;
+        int[] columnWidth = { 30, 15, 15,10 };
+        String[] columnName = { "检查项目", "单工序抽检数", "单工序良品数","单工序良品率"};
 
+
+        SampleDataHandler sampleDataHandler=new SampleDataHandler();
+        List<Integer> c_idList=new ArrayList<Integer>();
+        List<CheckItem> checkItemList=new ArrayList<CheckItem>();
+        checkItemList=checkItemDao.getCheckItemListByPID(p_id);
+        for(CheckItem checkItem:checkItemList){
+            System.out.println("c_id---->"+checkItem.getC_id());
+            c_idList.add(checkItem.getC_id());
+        }
+        int l=c_idList.size();
+        String[][] dataList=new String[l][16];
+        int i=0;
+        for(int c_id:c_idList) {
+            List<List<SampleData>> sampleDataList=new ArrayList<List<SampleData>>();
+            sampleDataList=getAllDataInCheckItem(c_id);
+            if(getIndicators(c_id).getUSL()!=0&&getIndicators(c_id).getUSL()!=0&&sampleDataList!=null){
+
+                updateSampleStatus(sampleDataList,getIndicators(c_id).getUSL()
+                        ,getIndicators(c_id).getLSL());
+                System.out.println("样本数据状态已经更新");
+            }
+
+
+            if (checkItemDao.get_CheckItem(c_id)==null)
+                continue;
+            String p_name = projectDao.get_projectByP_id(p_id).getP_name();
+            String itemName = checkItemDao.get_CheckItem(c_id).getC_name();
+            int passCount=sampleDataList==null?-9999:checkItemDao.getDataCountsBystatus(c_id,1);
+            int allCount=sampleDataList==null?-9999:checkItemDao.get_AllDataInCheckItem(c_id).size();
+            double passRate=sampleDataList==null?-9999:sampleDataHandler.get_stanardData((double)passCount/allCount);
+
+
+            dataList[i][0]=p_name+"/"+itemName;
+            dataList[i][1]=String.valueOf(passCount);
+            dataList[i][2]=String.valueOf(allCount);
+            dataList[i][3]=String.valueOf(passRate);
+            ++i;
+        }
+
+        try {
+            exportEcxcel.ExportNoResponse(sheetName, titleName, fileName,
+                    columnNumber, columnWidth, columnName, dataList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    /* 更新表中数据*/
+    public void updateDataIntable(List<SampleData> list){
+        System.out.println("参数传入样本id："+list);
+        for(SampleData sampleData:list){
+            System.out.println("参数传入样本id："+sampleData.getId()+"  值："+sampleData.getValue());
+
+            sampleDataDao.updateSD_Value(sampleData.getId(),sampleData.getValue());
+        }
     }
 
 }

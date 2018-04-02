@@ -2,10 +2,14 @@ package com.wj.dao;
 
 import com.wj.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +26,13 @@ public class CheckItemDao {
     private final static String UPDATE_NEST_CHECKITEM_TO_1_SQL="UPDATE checked_item SET c_status=1 WHERE c_id " +
             " = (SELECT c_id FROM (SELECT c_id FROM checked_item WHERE (c_status=1 OR c_status=2)AND p_id = ? ORDER BY c_id DESC " +
             "LIMIT 1) a )";
-    private final static String GET_CHECKITEM_SQL="SELECT * FROM checked_item WHERE c_id=?";
+    private final static String GET_CHECKITEM_SQL="SELECT * FROM checked_item WHERE c_id=? AND c_status!=0";
     private final static String GET_CHECKITEM_BY_PID_SQL="SELECT * FROM checked_item WHERE p_id = ?";
 
-    private final static String GET_ALL_DATA_SQL="SELECT * From d_group_info LEFT JOIN sampleData ON d_group_info.g_id = sampleData.g_id WHERE d_group_info.c_id = ? AND sampleData.s_status!=4";
-
+    private final static String GET_ALL_DATA_SQL="SELECT * From checked_item LEFT JOIN (d_group_info LEFT JOIN sampleData ON d_group_info.g_id = sampleData.g_id) ON " +
+            " checked_item.c_id=d_group_info.c_id  WHERE d_group_info.c_id = ? AND sampleData.s_status!=4 AND checked_item.c_status!=0";
+    private static String GET_DATA_COUNTS_BY_STATUS_SQL="SELECT COUNT(*) From checked_item LEFT JOIN (d_group_info LEFT JOIN sampleData ON d_group_info.g_id = sampleData.g_id) ON" +
+            " checked_item.c_id=d_group_info.c_id WHERE d_group_info.c_id = ? AND sampleData.s_status=? AND checked_item.c_status!=0";
     @Autowired
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate=jdbcTemplate;
@@ -49,7 +55,7 @@ public class CheckItemDao {
     * * c_status 项目状态 ：
     *                   1=当前正在使用中
     *                   2=未使用
-    *                   3=将不被使用，软删除*/
+    *                   0=将不被使用，软删除*/
     public void Update_CheckItem_Status(int c_id,int status){
         Object[] args = {status,c_id};
         jdbcTemplate.update(UPDATE_CHECKITEM_STATUS_SQL,args);
@@ -79,12 +85,30 @@ public class CheckItemDao {
     }
     /*获取该检查项目下所有样本数据对象
      */
-    public List<SampleData> Get_AllDataInCheckItem(int c_id){
+    public List<SampleData> get_AllDataInCheckItem(int c_id){
         Object[] args = {c_id};
         List<SampleData> sampleDataList = new ArrayList<SampleData>();
         sampleDataList=jdbcTemplate.query(GET_ALL_DATA_SQL,args,new BeanPropertyRowMapper<SampleData>(SampleData.class));
         return sampleDataList;
     }
+    /*获取某种状态下所有值的数量
+    * 用于计算合格率*/
+    public int getDataCountsBystatus(int c_id, int status){
+        Object[] args={c_id,status};
+        return  jdbcTemplate.query(GET_DATA_COUNTS_BY_STATUS_SQL,args,new ResultSetExtractor<List<Integer>>(){
+            @Override
+            public List<Integer> extractData(ResultSet resultSet)throws SQLException,DataAccessException {
+                List<Integer> list = new ArrayList<Integer>();
+
+                while (resultSet.next()){
+                    list.add(resultSet.getInt("COUNT(*)"));
+                }
+                return list;
+            }
+
+        }).get(0);
+    }
+
     /*获取所有组的id*/
     public List<D_Group> get_Group_In_CheckItem(int c_id){
         Object[] args = {c_id};

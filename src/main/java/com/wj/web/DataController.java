@@ -212,7 +212,7 @@ public class DataController {
         List<Double> SVlaueList = new ArrayList<Double>();
         List<List<SampleData>> allSList=dataService.getAllDataInCheckItem(c_id);
         List<Integer> xList = new ArrayList<Integer>();
-//        List<Integer> StatusList = new ArrayList<Integer>();
+
         List<SampleData> SList = new ArrayList<SampleData>();
         List<Double> Rlist=new ArrayList<Double>();
         SList=dataService.getALLSampleDataByCID(c_id);
@@ -227,9 +227,8 @@ public class DataController {
         double maxInSampleData=dataService.getMaxInList(SVlaueList);
         double max2=dataService.getMaxInList(Rlist);
         SampleDataHandler sampleDataHandler =new SampleDataHandler();
-//        double cpk=sampleDataHandler.get_CPK(SVlaueList,USL,LSL);
-        double SDRBD2=dataService.getSDBy_RBar_D2(Rlist);
-        double test=dataService.getStandardDevicationInTotal(SVlaueList);
+        double SDRBD2=allSList==null?0.0:dataService.getSDBy_RBar_D2(Rlist);
+//        double test=dataService.getStandardDevicationInTotal(SVlaueList);
 
 
         request.setAttribute("SVlaueList",SVlaueList);
@@ -242,7 +241,7 @@ public class DataController {
         request.setAttribute("LSL",LSL);
         request.setAttribute("U",U);
         request.setAttribute("SDRBD2",SDRBD2);
-        request.setAttribute("test",test);
+//        request.setAttribute("test",test);
 //        request.setAttribute("cpk",cpk);
         request.setAttribute("selected_p_id",selected_p_id);
         return new ModelAndView("tables");
@@ -277,8 +276,8 @@ public class DataController {
         List<List<SampleData>> dataInCheckItemByGroup = dataService.getAllDataInCheckItem(c_id);
         double USL=dataService.getIndicators(c_id).getUSL();
         double LSL=dataService.getIndicators(c_id).getLSL();
-        List<Double> Rlist=dataService.getRList(dataInCheckItemByGroup);
-        List<Double> CPkList = dataService.getCPkList(dataInCheckItemByGroup,USL,LSL);
+        List<Double> Rlist=dataInCheckItemByGroup==null?null:dataService.getRList(dataInCheckItemByGroup);
+        List<Double> CPkList = dataInCheckItemByGroup==null?null:dataService.getCPkList(dataInCheckItemByGroup,USL,LSL);
         xList=dataService.getObtainTimeInGID(c_id);
         Double max=dataService.getMaxInList(CPkList);
         Double min =dataService.getMinInList(CPkList);
@@ -305,7 +304,7 @@ public class DataController {
         xList=dataService.getObtainTimeInGID(c_id);
 
 
-        List<Double> passRateList = dataService.getPassRateList(dataInCheckItemByGroup,USL,LSL);
+        List<Double> passRateList = dataInCheckItemByGroup==null?null:dataService.getPassRateList(dataInCheckItemByGroup,USL,LSL);
         request.setAttribute("passRateList",passRateList);
         request.setAttribute("xList",xList);
         request.setAttribute("selected_p_id",selected_p_id);
@@ -317,72 +316,74 @@ public class DataController {
         List<SampleData> SListBySample=dataService.getALLSampleDataByCID(c_id);
         List<List<SampleData>> dataInCheckItemByGroup = dataService.getAllDataInCheckItem(c_id);
         SampleDataHandler sampleDataHandler=new SampleDataHandler();
-        List<Double> SVlaueList=dataService.getYOfSampleDataRunTable(SListBySample);//获取Y轴值
-        List<Double> Y=dataService.getXOfNormalDistributionChar(SListBySample);
-        double max=dataService.getMaxInList(Y);
+
+        if(SListBySample!=null) {
+            List<Double> SVlaueList = dataService.getYOfSampleDataRunTable(SListBySample);//获取Y轴值
+            List<Double> Y = dataService.getXOfNormalDistributionChar(SListBySample);
+            double max = dataService.getMaxInList(Y);
         /*统计值*/
-        //整体样本总数
-        //整体平均值
-        //整体最大值
-        //整体最小值
-        //组内  子组内样本数
-        int Num_total=SListBySample.size();
-        double avg_total=dataService.getAVGIntotal(SListBySample);
-        double max_total=dataService.getMaxInListForSampleData(SListBySample);
-        double min_total=dataService.getMinInListForSampleData(SListBySample);
-        int num_group=5;//这是固定的组内最大输入数
+            //整体样本总数
+            //整体平均值
+            //整体最大值
+            //整体最小值
+            //组内  子组内样本数
+            int Num_total = SListBySample.size();
+            double avg_total = dataService.getAVGIntotal(SListBySample);
+            double max_total = dataService.getMaxInListForSampleData(SListBySample);
+            double min_total = dataService.getMinInListForSampleData(SListBySample);
+            int num_group = 5;//这是固定的组内最大输入数
 
 
 
         /*常量*/
-        //组内 USL
-        //组内 LSL
-        //组内 U
-        double USL=dataService.getIndicators(c_id).getUSL();
-        double LSL=dataService.getIndicators(c_id).getLSL();
-        double U=dataService.getIndicators(c_id).getTargetValue();
+            //组内 USL
+            //组内 LSL
+            //组内 U
+            double USL = dataService.getIndicators(c_id).getUSL();
+            double LSL = dataService.getIndicators(c_id).getLSL();
+            double U = dataService.getIndicators(c_id).getTargetValue();
 
         /*计算值*/
-        //标准差（整体）
-        //正三倍标准差
-        //负三倍标准差
-        double standardDeviation=dataService.getStandardDevicationInTotal(SVlaueList);
-        double middleValue_total=dataService.getMinddleValue(SVlaueList);
-        double middleValue_total_AddThreeSD=middleValue_total+3*standardDeviation;
-        double middleValue_total_DecreaseThreeSD=middleValue_total-3*standardDeviation;
+            //标准差（整体）
+            //正三倍标准差
+            //负三倍标准差
+            double standardDeviation = dataService.getStandardDevicationInTotal(SVlaueList);
+            double middleValue_total = dataService.getMinddleValue(SVlaueList);
+            double middleValue_total_AddThreeSD = middleValue_total + 3 * standardDeviation;
+            double middleValue_total_DecreaseThreeSD = middleValue_total - 3 * standardDeviation;
 
         /*工序能力  组内*/
-        //CPL 测量过程均值趋近规格下限的程度
-        //CP
-        //CPU测量过程均值趋近规格上限的程度
-        //CPK等于 CPU 与 CPL 中的较小者。
-        double Cpl=dataService.getCPULK(dataInCheckItemByGroup,USL,LSL).get(0);
-        double Cpu=dataService.getCPULK(dataInCheckItemByGroup,USL,LSL).get(1);
-        double Cpk=dataService.getCPULK(dataInCheckItemByGroup,USL,LSL).get(2);
+            //CPL 测量过程均值趋近规格下限的程度
+            //CP
+            //CPU测量过程均值趋近规格上限的程度
+            //CPK等于 CPU 与 CPL 中的较小者。
+            double Cpl = dataService.getCPULK(dataInCheckItemByGroup, USL, LSL).get(0);
+            double Cpu = dataService.getCPULK(dataInCheckItemByGroup, USL, LSL).get(1);
+            double Cpk = dataService.getCPULK(dataInCheckItemByGroup, USL, LSL).get(2);
 
 
 
         /*工序能力  整体*/
-        //PPL 测量过程均值趋近规格下限的程度
-        //PPU测量过程均值趋近规格上限的程度
-        //PPK等于 PPU 与 PPL 中的较小者。
-        double Ppl=dataService.get_PPULK(SVlaueList,USL,LSL).get(0);
-        double Ppu=dataService.get_PPULK(SVlaueList,USL,LSL).get(1);
-        double Ppk=dataService.get_PPULK(SVlaueList,USL,LSL).get(2);
+            //PPL 测量过程均值趋近规格下限的程度
+            //PPU测量过程均值趋近规格上限的程度
+            //PPK等于 PPU 与 PPL 中的较小者。
+            double Ppl = dataService.get_PPULK(SVlaueList, USL, LSL).get(0);
+            double Ppu = dataService.get_PPULK(SVlaueList, USL, LSL).get(1);
+            double Ppk = dataService.get_PPULK(SVlaueList, USL, LSL).get(2);
 
         /*其它值*/
-        //Ca
-        double Ca=dataService.getCa(SVlaueList,USL,LSL);
+            //Ca
+            double Ca = dataService.getCa(SVlaueList, USL, LSL);
 
         /*
         * 实测性能*/
-        //1PPM 每百万件中有一件是不合格
-        //PPM<LSL=
-        //PPM>USL=
-        //PPM total=
-        Double PPM_LSL=dataService.getPPM(SVlaueList,USL,LSL).get(0);
-        Double PPM_USL=dataService.getPPM(SVlaueList,USL,LSL).get(1);
-        Double PPM=dataService.getPPM(SVlaueList,USL,LSL).get(2);
+            //1PPM 每百万件中有一件是不合格
+            //PPM<LSL=
+            //PPM>USL=
+            //PPM total=
+            Double PPM_LSL = dataService.getPPM(SVlaueList, USL, LSL).get(0);
+            Double PPM_USL = dataService.getPPM(SVlaueList, USL, LSL).get(1);
+            Double PPM = dataService.getPPM(SVlaueList, USL, LSL).get(2);
 
         /*预期性能（组内）*/
 
@@ -390,45 +391,78 @@ public class DataController {
         /*预期性能（整体）*/
 
 
+            request.setAttribute("Num_total", Num_total);
+            request.setAttribute("avg_total", avg_total);
+            request.setAttribute("max_total", max_total);
+            request.setAttribute("min_total", min_total);
+            request.setAttribute("num_group", num_group);
+
+            request.setAttribute("USL", USL);
+            request.setAttribute("LSL", LSL);
+            request.setAttribute("U", U);
+
+            request.setAttribute("standardDeviation", standardDeviation);
+            request.setAttribute("middleValue_total", middleValue_total);
+            request.setAttribute("middleValue_total_AddThreeSD", middleValue_total_AddThreeSD);
+            request.setAttribute("middleValue_total_DecreaseThreeSD", middleValue_total_DecreaseThreeSD);
+
+            request.setAttribute("Ca", Ca);
+
+            request.setAttribute("PPM_LSL", PPM_LSL);
+            request.setAttribute("PPM_USL", PPM_USL);
+            request.setAttribute("PPM", PPM);
+
+            request.setAttribute("Ppl", Ppl);
+            request.setAttribute("Ppu", Ppu);
+            request.setAttribute("Ppk", Ppk);
+
+            request.setAttribute("Cpl", Cpl);
+            request.setAttribute("Cpu", Cpu);
+            request.setAttribute("Cpk", Cpk);
 
 
-        request.setAttribute("Num_total",Num_total);
-        request.setAttribute("avg_total",avg_total);
-        request.setAttribute("max_total",max_total);
-        request.setAttribute("min_total",min_total);
-        request.setAttribute("num_group",num_group);
+            request.setAttribute("Y", Y);
+            request.setAttribute("max", max);
 
-        request.setAttribute("USL",USL);
-        request.setAttribute("LSL",LSL);
-        request.setAttribute("U",U);
+        }
+        else {
+            request.setAttribute("Num_total", null);
+            request.setAttribute("avg_total", null);
+            request.setAttribute("max_total", null);
+            request.setAttribute("min_total", null);
+            request.setAttribute("num_group", null);
 
-        request.setAttribute("standardDeviation",standardDeviation);
-        request.setAttribute("middleValue_total",middleValue_total);
-        request.setAttribute("middleValue_total_AddThreeSD",middleValue_total_AddThreeSD);
-        request.setAttribute("middleValue_total_DecreaseThreeSD",middleValue_total_DecreaseThreeSD);
+            request.setAttribute("USL", null);
+            request.setAttribute("LSL", null);
+            request.setAttribute("U", null);
 
-        request.setAttribute("Ca",Ca);
+            request.setAttribute("standardDeviation", null);
+            request.setAttribute("middleValue_total", null);
+            request.setAttribute("middleValue_total_AddThreeSD", null);
+            request.setAttribute("middleValue_total_DecreaseThreeSD", null);
 
-        request.setAttribute("PPM_LSL",PPM_LSL);
-        request.setAttribute("PPM_USL",PPM_USL);
-        request.setAttribute("PPM",PPM);
+            request.setAttribute("Ca", null);
 
-        request.setAttribute("Ppl",Ppl);
-        request.setAttribute("Ppu",Ppu);
-        request.setAttribute("Ppk",Ppk);
+            request.setAttribute("PPM_LSL", null);
+            request.setAttribute("PPM_USL", null);
+            request.setAttribute("PPM", null);
 
-        request.setAttribute("Cpl",Cpl);
-        request.setAttribute("Cpu",Cpu);
-        request.setAttribute("Cpk",Cpk);
+            request.setAttribute("Ppl", null);
+            request.setAttribute("Ppu", null);
+            request.setAttribute("Ppk", null);
 
-
-        request.setAttribute("Y",Y);
-        request.setAttribute("max",max);
-
-
-        request.setAttribute("selected_p_id",selected_p_id);
+            request.setAttribute("Cpl", null);
+            request.setAttribute("Cpu", null);
+            request.setAttribute("Cpk", null);
 
 
+            request.setAttribute("Y", null);
+            request.setAttribute("max", null);
+
+        }
+
+
+        request.setAttribute("selected_p_id", selected_p_id);
         return new ModelAndView("CPK_A_table");
     }
 
@@ -436,9 +470,54 @@ public class DataController {
     public ModelAndView exporeExcelOfProcessCapability(HttpServletRequest request, int p_id){
         try {
             dataService.exporeExcelOfProcessCapability(p_id);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+        List<CheckItem> checkItems = new ArrayList<CheckItem>();
+        checkItems=dataService.get_All_CheckItemInfoList(p_id);
+        request.setAttribute("checkItems",checkItems);
+        request.setAttribute("selected_p_id",p_id);
+        return new ModelAndView("checkItem");
+    }
+
+    @RequestMapping(value = "/exporeGoodProductRate.html")
+    public ModelAndView exporeGoodProductRate(HttpServletRequest request,int p_id){
+        try {
+            dataService.exporeGoodProductRate(p_id);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<CheckItem> checkItems = new ArrayList<CheckItem>();
+        checkItems=dataService.get_All_CheckItemInfoList(p_id);
+        request.setAttribute("checkItems",checkItems);
+        request.setAttribute("selected_p_id",p_id);
+        return new ModelAndView("checkItem");
+    }
+
+    @RequestMapping(value = "/updateDataIntable.html")
+    public ModelAndView updateDataIntable(HttpServletRequest request,GroupDataCommand groupDataCommand,int p_id,int c_id){
+        dataService.updateDataIntable(groupDataCommand.sampleDataList);//更新数据
+
+        List<List<SampleData>> sampleDataList = dataService.getAllDataInCheckItem(c_id);
+
+        if(dataService.getIndicators(c_id).getUSL()!=0&&dataService.getIndicators(c_id).getUSL()!=0){
+
+            dataService.updateSampleStatus(sampleDataList,dataService.getIndicators(c_id).getUSL()
+                    ,dataService.getIndicators(c_id).getLSL());
+            System.out.println("样本数据状态已经更新");
+        }
+        List<List<SampleData>> sampleDataList2 = dataService.getAllDataInCheckItem(c_id);
+        CheckItem checkItem = dataService.get_CheckItem(c_id);
+        List<CheckItem> checkItems=dataService.get_All_CheckItemInfoList(p_id);
+        Indicators indicatorsInDB=dataService.getIndicators(c_id);
+        request.setAttribute("indicatorsInDB",indicatorsInDB);
+        request.setAttribute("showedCheckItem",checkItem);
+        request.setAttribute("checkItems",checkItems);
+        request.setAttribute("sampleDataList",sampleDataList2);
+        request.setAttribute("selected_p_id",p_id);
+        request.setAttribute("selected_c_id",c_id);
         return new ModelAndView("checkItem");
     }
 
