@@ -165,7 +165,7 @@
             data:[' 样本数量数据']
         },
         xAxis: {
-
+            data:${X}
         },
         yAxis: {
             min:0,
@@ -174,8 +174,8 @@
         },
         series: [{
             name: 'CPk数据',
-            type: 'line',
-            color:"black",
+            type: 'bar',
+            color:"red",
             data: ${Y},
         }]
 

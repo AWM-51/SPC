@@ -455,9 +455,6 @@ public class DataService {
             CPkList.add(sampleDataHandler.get_CPK(tempList,USL,LSL,getRList(lists).get(i)));
             ++i;
         }
-//        for(Double i : CPkList){
-//            System.out.println("CPK-->"+i);
-//        }
         return CPkList;
     }
 
@@ -588,50 +585,66 @@ public class DataService {
         Double middleValue=temp.get((int)Math.floor(temp.size()/2));
         return middleValue;
     }
-    /*获取正态分布Y轴数据*/
+    /*获取正态分布X轴数据*/
     public List<Double> getXOfNormalDistributionChar(List<SampleData> list){
-//        double max=middleValue_total_AddThreeSD>=getMaxInListForSampleData(list)
-//                ?middleValue_total_AddThreeSD:getMaxInListForSampleData(list);
-//        double min=middleValue_total_DecreaseThreeSD<=getMinInListForSampleData(list)
-//                ?middleValue_total_DecreaseThreeSD:getMinInListForSampleData(list);
-        List<Double> temp=new ArrayList<Double>();
-//        int i=0;
-//        for(SampleData sampleData:list){
-//            weightedObservedPoints.add(i,sampleData.getValue());
-//            ++i;
-//        }
-        WeightedObservedPoints obs = new WeightedObservedPoints();
-        obs.add(0, 25);
-        obs.add(1, 68);
-        obs.add(2, 144);
-        obs.add(3, 220);
-        obs.add(4, 335);
-        obs.add(5, 199);
-        obs.add(6, 52);
-        obs.add(7, 14);
-        obs.add(8, 5);
-        obs.add(9, 2);
-        obs.add(0, 25);
-        obs.add(1, 68);
-        obs.add(2, 144);
-        obs.add(3, 220);
-        obs.add(4, 335);
-        obs.add(5, 199);
-        obs.add(6, 52);
-        obs.add(7, 14);
-        obs.add(8, 5);
-        obs.add(9, 2);
-        double[] parameters = GaussianCurveFitter.create().fit(obs.toList());
+        List<Double> xList=new ArrayList<Double>();
+        double max=getMaxInListForSampleData(list);
+        double min=getMinInListForSampleData(list);
+        double distance=(max-min)/5;
+        xList.add(min-0.5*distance);
+        xList.add(min+1.5*distance);
+        xList.add(min+2.5*distance);
+        xList.add(min+3.5*distance);
+        xList.add(min+4.5*distance);
+        xList.add(min+5.5*distance);
 
-        for (double i : parameters) {
+        return xList;
+    }
+    /*获取正态分布Y轴数据*/
+    public List<Double> getYOfNormalDistributionChar(List<SampleData> list){
+        System.out.println("获取正态分布Y轴数据--样本数量："+list.size());
+        List<Double> xList=getXOfNormalDistributionChar(list);
+        Double[] temp={0.0,0.0,0.0,0.0,0.0,0.0,0.0};//初始数量
+        List<Double> yList=new ArrayList<Double>();
+        int j=1;
 
-            System.out.println(parameters.length+"  "+i);
-            temp.add(i);
+        for(SampleData sampleData:list){
+            //进行分类
+            Double v=sampleData.getValue();
+            if(v<xList.get(0))
+            {
+                ++temp[0];
+            }
+            else if(v>=xList.get(0)&&v<xList.get(1)){
+                ++temp[1];
+            }
+            else if(v>=xList.get(1)&&v<xList.get(2)){
+                ++temp[2];
+            }
+            else if(v>=xList.get(2)&&v<xList.get(3)){
+                ++temp[3];
+            }
+            else if(v>=xList.get(3)&&v<xList.get(4)){
+                ++temp[4];
+            }
+            else if(v>=xList.get(4)&&v<xList.get(5)){
+                ++temp[5];
+            }
+            else if(v>=xList.get(5)){
+                ++temp[6];
+            }
+            System.out.print("第"+j+"个数判断：");
+            for(int i =0;i<7;++i){
+                System.out.print("t"+i+":"+temp[i]+"    ");
+            }
+            System.out.println();
+            ++j;
         }
-        return temp;
+        for(int i=0;i<7;++i){
+            yList.add(temp[i]);
+        }
 
-
-
+        return yList;
 
     }
 

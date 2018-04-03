@@ -133,6 +133,7 @@ public class SampleDataHandler {
         return get_stanardData(Cpk);
     }
     public  Double get_CPK(List<Double> dataList, Double USL ,Double LSL,Double SD){
+        System.out.println("SD----->"+SD);
         Double Cpl=get_Cpl(dataList,LSL,SD);
         Double Cpu=get_Cpu(dataList,USL,SD);
 
@@ -197,7 +198,14 @@ public class SampleDataHandler {
     }
     /*计算极差 参数为样本数据对象*/
     public Double get_R_S(List<SampleData> list){
-        return get_stanardData(getMaxInListForSampleData(list)-getMinInListForSampleData(list));
+//        System.out.println("计算极差："+getMaxInListForSampleData(list)+"-"+getMinInListForSampleData(list));
+        if(getMaxInListForSampleData(list)-getMinInListForSampleData(list)==0){
+            return 0.00000001;
+        }
+        else {
+            return get_stanardData(getMaxInListForSampleData(list)-getMinInListForSampleData(list));
+        }
+
     }
 
     /* 通过RBar/d2 来估计极差*/

@@ -319,7 +319,8 @@ public class DataController {
 
         if(SListBySample!=null) {
             List<Double> SVlaueList = dataService.getYOfSampleDataRunTable(SListBySample);//获取Y轴值
-            List<Double> Y = dataService.getXOfNormalDistributionChar(SListBySample);
+            List X=dataService.getXOfNormalDistributionChar(SListBySample);
+            List<Double> Y = dataService.getYOfNormalDistributionChar(SListBySample);
             double max = dataService.getMaxInList(Y);
         /*统计值*/
             //整体样本总数
@@ -421,6 +422,7 @@ public class DataController {
             request.setAttribute("Cpk", Cpk);
 
 
+            request.setAttribute("X",X);
             request.setAttribute("Y", Y);
             request.setAttribute("max", max);
 
