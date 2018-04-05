@@ -181,9 +181,9 @@
             markLine : {
                 data : [
                     // 纵轴，默认
-                    {type : 'max', name: '最大值', itemStyle:{normal:{color:'#dc143c'}}},
-                    {type : 'min', name: '最小值', itemStyle:{normal:{color:'#dc143c'}}},
-                    {type : 'average', name : '平均值', itemStyle:{normal:{color:'#dc143c'}}},
+//                    {type : 'max', name: '最大值', itemStyle:{normal:{color:'#dc143c'}}},
+//                    {type : 'min', name: '最小值', itemStyle:{normal:{color:'#dc143c'}}},
+//                    {type : 'average', name : '平均值', itemStyle:{normal:{color:'#dc143c'}}},
                     {
                         name: 'USL',
                         yAxis: ${USL-LSL},

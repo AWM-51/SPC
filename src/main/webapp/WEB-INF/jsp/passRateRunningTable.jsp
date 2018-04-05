@@ -37,7 +37,7 @@
     // 指定图表的配置项和数据
     var option = {
         title: {
-            text: '均值运行图'
+            text: ' 合格率运行图'
         },
         tooltip: {},
         legend: {

@@ -3,6 +3,7 @@ package com.wj.web;
 import com.sun.org.apache.xpath.internal.operations.Mod;
 import com.wj.domain.*;
 import com.wj.service.DataService;
+import com.wj.util.CurveFitting;
 import com.wj.util.SampleDataHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -319,8 +320,9 @@ public class DataController {
 
         if(SListBySample!=null) {
             List<Double> SVlaueList = dataService.getYOfSampleDataRunTable(SListBySample);//获取Y轴值
-            List X=dataService.getXOfNormalDistributionChar(SListBySample);
-            List<Double> Y = dataService.getYOfNormalDistributionChar(SListBySample);
+            List Xlist=dataService.getXOfNormalDistributionChar(SListBySample);
+
+            List<Double> Y = dataService.ChangY(dataService.getYOfNormalDistributionChar(SListBySample),3);//为了和X轴坐标对应，在两边再加上几个0
             double max = dataService.getMaxInList(Y);
         /*统计值*/
             //整体样本总数
@@ -344,12 +346,18 @@ public class DataController {
             double LSL = dataService.getIndicators(c_id).getLSL();
             double U = dataService.getIndicators(c_id).getTargetValue();
 
+            List<Double> X=dataService.ChangX(Xlist,USL,LSL,3);
+
         /*计算值*/
             //标准差（整体）
             //正三倍标准差
             //负三倍标准差
-            double standardDeviation = dataService.getStandardDevicationInTotal(SVlaueList);
-            double middleValue_total = dataService.getMinddleValue(SVlaueList);
+            CurveFitting curveFitting=new CurveFitting();
+            double[] p=curveFitting.CurveFittingParameters(Xlist,dataService.getYOfNormalDistributionChar(SListBySample));
+            double standardDeviation = p[2];
+                    //dataService.getStandardDevicationInTotal(SVlaueList);
+            double middleValue_total = p[1];
+                    //dataService.getMinddleValue(SVlaueList);
             double middleValue_total_AddThreeSD = middleValue_total + 3 * standardDeviation;
             double middleValue_total_DecreaseThreeSD = middleValue_total - 3 * standardDeviation;
 

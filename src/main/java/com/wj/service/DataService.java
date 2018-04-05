@@ -855,5 +855,39 @@ public class DataService {
             sampleDataDao.updateSD_Value(sampleData.getId(),sampleData.getValue());
         }
     }
+    /*加长X坐标轴*/
+    public List<Double> ChangX(List<Double> x,Double USL,Double LSL,int a){
+        Double t1=x.get(0);
+        Double t2=x.get(x.size()-1);
+        List<Double> leftList=new ArrayList<Double>();
+        List<Double> rightList=new ArrayList<Double>();
+        Double d=USL-LSL;
+        for(int i=1;i<=a;++i){
+            leftList.add(t1-d*(a-i+1));
+            rightList.add(t2+d*i);
+        }
+        List<Double> list=new ArrayList<Double>();
+        list.addAll(leftList);
+        list.addAll(x);
+        list.addAll(rightList);
+        return list;
+
+    }
+    /*加长Y坐标轴集合*/
+    public List<Double> ChangY(List<Double> x,int a){
+        List<Double> leftList=new ArrayList<Double>();
+        List<Double> rightList=new ArrayList<Double>();
+
+        for(int i=1;i<=a;++i){
+            leftList.add(0.0);
+            rightList.add(0.0);
+        }
+        List<Double> list=new ArrayList<Double>();
+        list.addAll(leftList);
+        list.addAll(x);
+        list.addAll(rightList);
+        return list;
+
+    }
 
 }
