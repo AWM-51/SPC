@@ -26,8 +26,8 @@ public class CheckItemDao {
     private final static String UPDATE_NEST_CHECKITEM_TO_1_SQL="UPDATE checked_item SET c_status=1 WHERE c_id " +
             " = (SELECT c_id FROM (SELECT c_id FROM checked_item WHERE (c_status=1 OR c_status=2)AND p_id = ? ORDER BY c_id DESC " +
             "LIMIT 1) a )";
-    private final static String GET_CHECKITEM_SQL="SELECT * FROM checked_item WHERE c_id=? AND c_status!=0";
-    private final static String GET_CHECKITEM_BY_PID_SQL="SELECT * FROM checked_item WHERE p_id = ?";
+    private final static String GET_CHECKITEM_SQL="SELECT * FROM checked_item WHERE (c_status=1 OR c_status=2) AND c_id=? ";
+    private final static String GET_CHECKITEM_BY_PID_SQL="SELECT * FROM checked_item WHERE p_id = ? AND (c_status=1 OR c_status=2)";
 
     private final static String GET_ALL_DATA_SQL="SELECT * From checked_item LEFT JOIN (d_group_info LEFT JOIN sampleData ON d_group_info.g_id = sampleData.g_id) ON " +
             " checked_item.c_id=d_group_info.c_id  WHERE d_group_info.c_id = ? AND sampleData.s_status!=4 AND checked_item.c_status!=0";

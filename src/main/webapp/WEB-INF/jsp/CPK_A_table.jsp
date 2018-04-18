@@ -158,7 +158,7 @@
     // 指定图表的配置项和数据
     var option = {
         title: {
-            text: 'CPK运行图'
+            text: 'CPK分析图'
         },
         tooltip: {},
         legend: {
@@ -166,151 +166,152 @@
         },
         xAxis: {
             data:${X}
-            <%--min:${LSL-2*(USL-LSL)},--%>
-            <%--max:${USL+2*(USL-LSL)},--%>
+            <%--min:${X.get(0)},--%>
+            <%--max:${X.get(X.size()-1)},--%>
             <%--scale:true--%>
         },
         yAxis: {
             min:0,
             max:${max*1.2},
             scale:true
+
         },
         series: [{
             name: 'CPk数据',
             type: 'bar',
             color:"red",
             data: ${Y},
-            markLine : {
-                color:"green",
-                data : [
-                    // 纵轴，默认
-                    {
-                        name: 'USL',
-                        xAxis: ${USL},
-                        itemStyle : {
-                            normal : {
-                                lineStyle:{
-                                    color:'green',
-                                    type:'dotted'  //'dotted'虚线 'solid'实线
-                                },
+            <%--markLine : {--%>
+                <%--color:"green",--%>
+                <%--data : [--%>
+                    <%--// 纵轴，默认--%>
+                    <%--{--%>
+                        <%--name: 'USL',--%>
+                        <%--xAxis: ${USL},--%>
+                        <%--itemStyle : {--%>
+                            <%--normal : {--%>
+                                <%--lineStyle:{--%>
+                                    <%--color:'black',--%>
+                                    <%--type:'dotted'  //'dotted'虚线 'solid'实线--%>
+                                <%--},--%>
 
-                                label:{
-                                    show: true,
-                                    formatter: '{b} : {c}' ,
-                                    color:"green",
-                                    position: 'middle',/*****文字显示的位置**********/
-                                },
-                                labelLine :{show:true}
-                            }
-                        }
-                    },
-                    {
-                        name: 'LSL',
-                        xAxis: ${LSL},
-                        itemStyle : {
-                            normal : {
-                                lineStyle:{
-                                    color:'green',
-                                    type:'dotted'  //'dotted'虚线 'solid'实线
-                                },
+                                <%--label:{--%>
+                                    <%--show: true,--%>
+                                    <%--formatter: '{b} : {c}' ,--%>
+                                    <%--color:"green",--%>
+                                    <%--position: 'middle',/*****文字显示的位置**********/--%>
+                                <%--},--%>
+                                <%--labelLine :{show:true}--%>
+                            <%--}--%>
+                        <%--}--%>
+                    <%--},--%>
+                    <%--{--%>
+                        <%--name: 'LSL',--%>
+                        <%--xAxis: ${LSL},--%>
+                        <%--itemStyle : {--%>
+                            <%--normal : {--%>
+                                <%--lineStyle:{--%>
+                                    <%--color:'black',--%>
+                                    <%--type:'dotted'  //'dotted'虚线 'solid'实线--%>
+                                <%--},--%>
 
-                                label:{
-                                    show: true,
-                                    formatter: '{b} : {c}' ,
-                                    color:"green",
-                                    position: 'middle',/*****文字显示的位置**********/
-                                },
-                                labelLine :{show:true}
-                            }
-                        }
-                    }
-                    ,
-                    {
-                        name: 'tragetValue',
-                        xAxis: ${U},
-                        itemStyle : {
-                            normal : {
-                                lineStyle:{
-                                    color:'green',
-                                    type:'dotted'  //'dotted'虚线 'solid'实线
-                                },
+                                <%--label:{--%>
+                                    <%--show: true,--%>
+                                    <%--formatter: '{b} : {c}' ,--%>
+                                    <%--color:"green",--%>
+                                    <%--position: 'middle',/*****文字显示的位置**********/--%>
+                                <%--},--%>
+                                <%--labelLine :{show:true}--%>
+                            <%--}--%>
+                        <%--}--%>
+                    <%--}--%>
+                    <%--,--%>
+                    <%--{--%>
+                        <%--name: 'tragetValue',--%>
+                        <%--xAxis: ${U},--%>
+                        <%--itemStyle : {--%>
+                            <%--normal : {--%>
+                                <%--lineStyle:{--%>
+                                    <%--color:'black',--%>
+                                    <%--type:'dotted'  //'dotted'虚线 'solid'实线--%>
+                                <%--},--%>
 
-                                label:{
-                                    show: true,
-                                    formatter: '{b} : {c}' ,
-                                    color:"green",
-                                    position: 'middle',/*****文字显示的位置**********/
-                                },
-                                labelLine :{show:true}
-                            }
-                        }
-                    }
-                    ,
-                    {
-                        name: 'Mean',
-                        xAxis: ${middleValue_total},
-                        itemStyle : {
-                            normal : {
-                                lineStyle:{
-                                    color:'green',
-                                    type:'dotted'  //'dotted'虚线 'solid'实线
-                                },
+                                <%--label:{--%>
+                                    <%--show: true,--%>
+                                    <%--formatter: '{b} : {c}' ,--%>
+                                    <%--color:"green",--%>
+                                    <%--position: 'middle',/*****文字显示的位置**********/--%>
+                                <%--},--%>
+                                <%--labelLine :{show:true}--%>
+                            <%--}--%>
+                        <%--}--%>
+                    <%--}--%>
+                    <%--,--%>
+                    <%--{--%>
+                        <%--name: 'Mean',--%>
+                        <%--xAxis: ${middleValue_total},--%>
+                        <%--itemStyle : {--%>
+                            <%--normal : {--%>
+                                <%--lineStyle:{--%>
+                                    <%--color:'green',--%>
+                                    <%--type:'dotted'  //'dotted'虚线 'solid'实线--%>
+                                <%--},--%>
 
-                                label:{
-                                    show: true,
-                                    formatter: '{b} : {c}' ,
-                                    color:"green",
-                                    position: 'middle',/*****文字显示的位置**********/
-                                },
-                                labelLine :{show:true}
-                            }
-                        }
-                    }
-                    ,
-                    {
-                        name: '-3Sigma',
-                        xAxis: ${middleValue_total_DecreaseThreeSD},
-                        itemStyle : {
-                            normal : {
-                                lineStyle:{
-                                    color:'green',
-                                    type:'dotted'  //'dotted'虚线 'solid'实线
-                                },
+                                <%--label:{--%>
+                                    <%--show: true,--%>
+                                    <%--formatter: '{b} : {c}' ,--%>
+                                    <%--color:"green",--%>
+                                    <%--position: 'middle',/*****文字显示的位置**********/--%>
+                                <%--},--%>
+                                <%--labelLine :{show:true}--%>
+                            <%--}--%>
+                        <%--}--%>
+                    <%--}--%>
+                    <%--,--%>
+                    <%--{--%>
+                        <%--name: '-3Sigma',--%>
+                        <%--xAxis: ${middleValue_total_DecreaseThreeSD},--%>
+                        <%--itemStyle : {--%>
+                            <%--normal : {--%>
+                                <%--lineStyle:{--%>
+                                    <%--color:'green',--%>
+                                    <%--type:'dotted'  //'dotted'虚线 'solid'实线--%>
+                                <%--},--%>
 
-                                label:{
-                                    show: true,
-                                    formatter: '{b} : {c}' ,
-                                    color:"green",
-                                    position: 'middle',/*****文字显示的位置**********/
-                                },
-                                labelLine :{show:true}
-                            }
-                        }
-                    }
-                    ,
-                    {
-                        name: '+3Sigma',
-                        xAxis: ${middleValue_total_AddThreeSD},
-                        itemStyle : {
-                            normal : {
-                                lineStyle:{
-                                    color:'green',
-                                    type:'dotted'  //'dotted'虚线 'solid'实线
-                                },
+                                <%--label:{--%>
+                                    <%--show: true,--%>
+                                    <%--formatter: '{b} : {c}' ,--%>
+                                    <%--color:"green",--%>
+                                    <%--position: 'middle',/*****文字显示的位置**********/--%>
+                                <%--},--%>
+                                <%--labelLine :{show:true}--%>
+                            <%--}--%>
+                        <%--}--%>
+                    <%--}--%>
+                    <%--,--%>
+                    <%--{--%>
+                        <%--name: '+3Sigma',--%>
+                        <%--xAxis: ${middleValue_total_AddThreeSD},--%>
+                        <%--itemStyle : {--%>
+                            <%--normal : {--%>
+                                <%--lineStyle:{--%>
+                                    <%--color:'green',--%>
+                                    <%--type:'dotted'  //'dotted'虚线 'solid'实线--%>
+                                <%--},--%>
 
-                                label:{
-                                    show: true,
-                                    formatter: '{b} : {c}' ,
-                                    color:"green",
-                                    position: 'middle',/*****文字显示的位置**********/
-                                },
-                                labelLine :{show:true}
-                            }
-                        }
-                    }
+                                <%--label:{--%>
+                                    <%--show: true,--%>
+                                    <%--formatter: '{b} : {c}' ,--%>
+                                    <%--color:"green",--%>
+                                    <%--position: 'middle',/*****文字显示的位置**********/--%>
+                                <%--},--%>
+                                <%--labelLine :{show:true}--%>
+                            <%--}--%>
+                        <%--}--%>
+                    <%--}--%>
 
-                ]
-            }
+                <%--]--%>
+            <%--}--%>
         }]
 
 

@@ -155,7 +155,7 @@ public class DataController {
         List<List<SampleData>>SDInGroup=dataService.getAllDataInCheckItem(selected_c_id);
         SList=dataService.getALLSampleDataByCID(selected_c_id);
         SVlaueList=dataService.getYOfSampleDataRunTable(SList);//
-        if(SVlaueList.size()!=0){//判断样本数据是否为空
+        if(SVlaueList!=null&&SVlaueList.size()!=0){//判断样本数据是否为空
             dataService.updateSampleStatus(SDInGroup,USL,LSL);//更新样本数据状态
         }
 
@@ -189,7 +189,7 @@ public class DataController {
         dataService.clickAtCheckItem(c_id);//点击转换状态
         List<List<SampleData>> sampleDataList = dataService.getAllDataInCheckItem(c_id);
 
-        if(dataService.getIndicators(c_id).getUSL()!=0&&dataService.getIndicators(c_id).getUSL()!=0){
+        if(sampleDataList!=null&&dataService.getIndicators(c_id).getUSL()!=0&&dataService.getIndicators(c_id).getUSL()!=0){
 
             dataService.updateSampleStatus(sampleDataList,dataService.getIndicators(c_id).getUSL()
                     ,dataService.getIndicators(c_id).getLSL());
@@ -346,7 +346,7 @@ public class DataController {
             double LSL = dataService.getIndicators(c_id).getLSL();
             double U = dataService.getIndicators(c_id).getTargetValue();
 
-            List<Double> X=dataService.ChangX(Xlist,USL,LSL,3);
+            List<Double> X=dataService.ChangX(Xlist,USL,LSL,5);
 
         /*计算值*/
             //标准差（整体）
@@ -361,14 +361,15 @@ public class DataController {
             double middleValue_total_AddThreeSD = middleValue_total + 3 * standardDeviation;
             double middleValue_total_DecreaseThreeSD = middleValue_total - 3 * standardDeviation;
 
-        /*工序能力  组内*/
+            /*工序能力  组内*/
             //CPL 测量过程均值趋近规格下限的程度
             //CP
             //CPU测量过程均值趋近规格上限的程度
             //CPK等于 CPU 与 CPL 中的较小者。
-            double Cpl = dataService.getCPULK(dataInCheckItemByGroup, USL, LSL).get(0);
-            double Cpu = dataService.getCPULK(dataInCheckItemByGroup, USL, LSL).get(1);
-            double Cpk = dataService.getCPULK(dataInCheckItemByGroup, USL, LSL).get(2);
+            double Cpl=-99999 ;
+            double Cpu=-99999 ;
+            double Cpk=-99999;
+
 
 
 
@@ -376,13 +377,13 @@ public class DataController {
             //PPL 测量过程均值趋近规格下限的程度
             //PPU测量过程均值趋近规格上限的程度
             //PPK等于 PPU 与 PPL 中的较小者。
-            double Ppl = dataService.get_PPULK(SVlaueList, USL, LSL).get(0);
-            double Ppu = dataService.get_PPULK(SVlaueList, USL, LSL).get(1);
-            double Ppk = dataService.get_PPULK(SVlaueList, USL, LSL).get(2);
+            double Ppl=-99999 ;//初始值为-99999，说明USL，LSL未输入
+            double Ppu=-99999 ;
+            double Ppk=-99999 ;
 
         /*其它值*/
             //Ca
-            double Ca = dataService.getCa(SVlaueList, USL, LSL);
+            double Ca=-99999 ;
 
         /*
         * 实测性能*/
@@ -390,9 +391,46 @@ public class DataController {
             //PPM<LSL=
             //PPM>USL=
             //PPM total=
-            Double PPM_LSL = dataService.getPPM(SVlaueList, USL, LSL).get(0);
-            Double PPM_USL = dataService.getPPM(SVlaueList, USL, LSL).get(1);
-            Double PPM = dataService.getPPM(SVlaueList, USL, LSL).get(2);
+            double PPM_LSL=-99999 ;
+            double PPM_USL=-99999 ;
+            double PPM=-99999 ;
+
+            if(USL!=0.0||LSL!=0.0){
+                /*工序能力  组内*/
+                //CPL 测量过程均值趋近规格下限的程度
+                //CP
+                //CPU测量过程均值趋近规格上限的程度
+                //CPK等于 CPU 与 CPL 中的较小者。
+                Cpl = dataService.getCPULK(dataInCheckItemByGroup, USL, LSL).get(0);
+                Cpu = dataService.getCPULK(dataInCheckItemByGroup, USL, LSL).get(1);
+                Cpk = dataService.getCPULK(dataInCheckItemByGroup, USL, LSL).get(2);
+
+
+
+
+        /*工序能力  整体*/
+                //PPL 测量过程均值趋近规格下限的程度
+                //PPU测量过程均值趋近规格上限的程度
+                //PPK等于 PPU 与 PPL 中的较小者。
+                Ppl = dataService.get_PPULK(SVlaueList, USL, LSL).get(0);
+                Ppu = dataService.get_PPULK(SVlaueList, USL, LSL).get(1);
+                Ppk = dataService.get_PPULK(SVlaueList, USL, LSL).get(2);
+
+        /*其它值*/
+                //Ca
+                Ca = dataService.getCa(SVlaueList, USL, LSL);
+
+        /*
+        * 实测性能*/
+                //1PPM 每百万件中有一件是不合格
+                //PPM<LSL=
+                //PPM>USL=
+                //PPM total=
+                PPM_LSL = dataService.getPPM(SVlaueList, USL, LSL).get(0);
+                PPM_USL = dataService.getPPM(SVlaueList, USL, LSL).get(1);
+                PPM = dataService.getPPM(SVlaueList, USL, LSL).get(2);
+            }
+
 
         /*预期性能（组内）*/
 
@@ -486,8 +524,10 @@ public class DataController {
         }
         List<CheckItem> checkItems = new ArrayList<CheckItem>();
         checkItems=dataService.get_All_CheckItemInfoList(p_id);
+        int selected_c_id=dataService.getNestCheckItem(p_id).getC_id();
         request.setAttribute("checkItems",checkItems);
         request.setAttribute("selected_p_id",p_id);
+        request.setAttribute("selected_c_id",selected_c_id);
         return new ModelAndView("checkItem");
     }
 
@@ -501,8 +541,10 @@ public class DataController {
         }
         List<CheckItem> checkItems = new ArrayList<CheckItem>();
         checkItems=dataService.get_All_CheckItemInfoList(p_id);
+        int selected_c_id=dataService.getNestCheckItem(p_id).getC_id();
         request.setAttribute("checkItems",checkItems);
         request.setAttribute("selected_p_id",p_id);
+        request.setAttribute("selected_c_id",selected_c_id);
         return new ModelAndView("checkItem");
     }
 

@@ -270,7 +270,6 @@ public class DataService {
             tempDicators.setLSL(0);
             tempDicators.setTargetValue(0);
             return  tempDicators;
-
         }
 
         else {
@@ -702,9 +701,10 @@ public class DataService {
 
     public void exporeExcelOfProcessCapability(int p_id) throws Exception {
         ExportEcxcel exportEcxcel=new ExportEcxcel();
-        String sheetName = "工序能力报表";
-        String titleName = "工序能力报表";
-        String fileName = "工序能力报表";
+        String p_name=projectDao.get_projectByP_id(p_id).getP_name();
+        String sheetName = p_name+"工序能力报表";
+        String titleName = p_name+"工序能力报表";
+        String fileName = p_name+"工序能力报表";
         int columnNumber = 16;
         int[] columnWidth = { 30, 10, 10,10,10,10,10,10,15,15,15,15,15,15,15,15 };
         String[] columnName = { "检查项目", "Cpk", "Cp","Cpl","Cpu","Ppk","Pp","Ppl","Ppu","平均值"
@@ -723,7 +723,7 @@ public class DataService {
         int l=c_idList.size();
         String[][] dataList=new String[l][16];
         int i=0;
-        String p_name=projectDao.get_projectByP_id(p_id).getP_name();
+
         for(Integer c_id:c_idList){
             List<SampleData> SListBySample=getALLSampleDataByCID(c_id);
             List<List<SampleData>> dataInCheckItemByGroup = getAllDataInCheckItem(c_id);
@@ -790,11 +790,12 @@ public class DataService {
     /*导出良品率*/
     public void exporeGoodProductRate(int p_id){
         ExportEcxcel exportEcxcel=new ExportEcxcel();
-        String sheetName = "良品率报表";
-        String titleName = "良品率报表";
-        String fileName = "良品率报表";
+        String p_name=projectDao.get_projectByP_id(p_id).getP_name();
+        String sheetName = p_name+"良品率报表";
+        String titleName = p_name+"良品率报表";
+        String fileName = p_name+"良品率报表";
         int columnNumber = 4;
-        int[] columnWidth = { 30, 15, 15,10 };
+        int[] columnWidth = { 30, 15, 15,10 };//列宽ß
         String[] columnName = { "检查项目", "单工序抽检数", "单工序良品数","单工序良品率"};
 
 
@@ -822,7 +823,7 @@ public class DataService {
 
             if (checkItemDao.get_CheckItem(c_id)==null)
                 continue;
-            String p_name = projectDao.get_projectByP_id(p_id).getP_name();
+//            String p_name = projectDao.get_projectByP_id(p_id).getP_name();
             String itemName = checkItemDao.get_CheckItem(c_id).getC_name();
             int passCount=sampleDataList==null?-9999:checkItemDao.getDataCountsBystatus(c_id,1);
             int allCount=sampleDataList==null?-9999:checkItemDao.get_AllDataInCheckItem(c_id).size();
@@ -861,7 +862,7 @@ public class DataService {
         Double t2=x.get(x.size()-1);
         List<Double> leftList=new ArrayList<Double>();
         List<Double> rightList=new ArrayList<Double>();
-        Double d=USL-LSL;
+        Double d=(USL-LSL)/5;
         for(int i=1;i<=a;++i){
             leftList.add(t1-d*(a-i+1));
             rightList.add(t2+d*i);

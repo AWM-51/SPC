@@ -24,7 +24,7 @@ public class ReadExcel {
     读取.xls表格
     读取 抽检时间，样本1，2，3，4，5
     录入时间自动生成 格式如 2017-01-02
-    如果某行有空值，则该行无效（后期优化成空值设为0）
+    如果某行有空值，则该列录制结束（可优化成空值设为0）
     * */
     public List<List<SampleData>> readXls(MultipartFile file,Date entryTime) throws IOException, ParseException,NullPointerException {
         InputStream is = file.getInputStream();
