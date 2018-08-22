@@ -896,7 +896,7 @@ public class DataService {
         try {
             String b=a;
             System.out.println(b.getBytes());
-        }catch (NullPointerException e){
+        }catch (Exception e){
             System.out.println(e);
         }
     }
