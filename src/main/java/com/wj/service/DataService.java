@@ -891,7 +891,7 @@ public class DataService {
 
     }
     
-     @Transactional
+     @Transactional(rollbackFor=Exception.class)
     public void test(String a){
         try {
             String b=a;
