@@ -890,5 +890,15 @@ public class DataService {
         return list;
 
     }
+    
+     @Transactional
+    public void test(String a){
+        try {
+            String b=a;
+            System.out.println(b.getBytes());
+        }catch (NullPointerException e){
+            System.out.println(e);
+        }
+    }
 
 }
