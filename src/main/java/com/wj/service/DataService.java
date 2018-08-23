@@ -891,14 +891,6 @@ public class DataService {
 
     }
     
-     @Transactional(rollbackFor=Exception.class)
-    public void test(String a){
-        try {
-            String b=a;
-            System.out.println(b.getBytes());
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
+     
 
 }
